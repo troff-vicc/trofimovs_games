@@ -88,21 +88,26 @@ class Place:
                     running = False
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    # Проверяем, что клик внутри игрового поля
-                    if (BORDER_WIDTH <= mouse_x < WINDOW_SIZE - BORDER_WIDTH and
-                            BORDER_WIDTH <= mouse_y < WINDOW_SIZE - BORDER_WIDTH):
+                    if not self.game.is_solved():
+                        mouse_x, mouse_y = pygame.mouse.get_pos()
+                        # Проверяем, что клик внутри игрового поля
+                        if (BORDER_WIDTH <= mouse_x < WINDOW_SIZE - BORDER_WIDTH and
+                                BORDER_WIDTH <= mouse_y < WINDOW_SIZE - BORDER_WIDTH):
 
-                        # Вычисляем позицию плитки
-                        col = (mouse_x - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
-                        row = (mouse_y - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
+                            # Вычисляем позицию плитки
+                            col = (mouse_x - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
+                            row = (mouse_y - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
 
-                        if 0 <= row < self.game.size and 0 <= col < self.game.size:
-                            tile_pos = row * self.game.size + col
-                            tile_value = self.game.tiles[tile_pos]
-                            self.game.move_tile(tile_value)
-
+                            if 0 <= row < 4 and 0 <= col < 4:
+                                tile_pos = row * 4 + col
+                                self.game.move_tile(tile_pos)
+                        else:
+                            running = False  # Закрыть игру после победы
             self.draw_place()
+
+            # Если игра завершена - показываем экран победы
+            if self.game.is_solved():
+                pygame.display.set_caption("Победа")
 
             pygame.display.flip()
             self.clock.tick(FPS)
