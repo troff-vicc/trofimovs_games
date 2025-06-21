@@ -16,7 +16,7 @@ class Game:
         
         indexO = np.where(self.tiles == 0)
         np.delete(self.tiles, indexO)
-        self.empty_pos = indexO[0]
+        self.empty_pos = indexO[0][0]
         
         inversions = 0
         for i in range(15):
@@ -25,8 +25,7 @@ class Game:
                     inversions += 1
                     
         empty_row = 3 - self.empty_pos//4
-
-        if (inversions + empty_row) % 2 != 0:
+        if (inversions + empty_row) % 2 == 0:
             i = 0 if self.empty_pos != 0 and self.empty_pos != 1 else 14
             self.tiles[i], self.tiles[i+1] = self.tiles[i+1], self.tiles[i]
 
@@ -52,7 +51,7 @@ class Game:
         tilesTrue = np.arange(1, 17)
         tilesTrue[15] = 0
         
-        if self.tiles == tilesTrue:
+        if (self.tiles == tilesTrue).all():
             return True
         
         return False
