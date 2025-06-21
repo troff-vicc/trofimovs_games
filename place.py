@@ -1,8 +1,9 @@
 import pygame
 from constants import *
 
+
 class Place:
-    
+
     def __init__(self, game):
         pygame.init()
         self.game = game
@@ -10,7 +11,6 @@ class Place:
         pygame.display.set_caption("Пятнашки")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont('Arial', FONT_SIZE, bold=True)
-
 
     def draw_place(self):
         """Отрисовываем игровое поле"""
@@ -88,12 +88,19 @@ class Place:
                     running = False
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    col = mouse_pos[0] // TILE_SIZE
-                    row = mouse_pos[1] // TILE_SIZE
-                    tile_index = row * 4 + col
-                    # двигаем плитку
-                    self.game.move_tile(tile_index)
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    # Проверяем, что клик внутри игрового поля
+                    if (BORDER_WIDTH <= mouse_x < WINDOW_SIZE - BORDER_WIDTH and
+                            BORDER_WIDTH <= mouse_y < WINDOW_SIZE - BORDER_WIDTH):
+
+                        # Вычисляем позицию плитки
+                        col = (mouse_x - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
+                        row = (mouse_y - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
+
+                        if 0 <= row < self.game.size and 0 <= col < self.game.size:
+                            tile_pos = row * self.game.size + col
+                            tile_value = self.game.tiles[tile_pos]
+                            self.game.move_tile(tile_value)
 
             self.draw_place()
 
