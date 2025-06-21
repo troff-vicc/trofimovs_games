@@ -1,6 +1,7 @@
+from game import Game
 from place import Place
 
-place = Place()
-
-if __name__ == '__main__':
-    place.print_place()
+if __name__ == "__main__":
+    game_logic = Game()      # Создаем логику игры
+    game_display = Place(game_logic)  # Передаем логику в отрисовку
+    game_display.run()       # Запускаем игровой цикл
