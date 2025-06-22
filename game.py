@@ -20,18 +20,18 @@ class Game:
         np.random.shuffle(self.tiles)
         
         indexO = np.where(self.tiles == 0)
-        np.delete(self.tiles, indexO)
         self.empty_pos = indexO[0][0]
+        tiles_o = self.tiles[self.tiles != 0]
         
         inversions = 0
         for i in range(15):
             for j in range(i + 1, 15):
-                if self.tiles[i] > self.tiles[j]:
+                if tiles_o[i] > tiles_o[j]:
                     inversions += 1
                     
-        empty_row = 3 - self.empty_pos//4
+        empty_row = self.empty_pos//4
         if (inversions + empty_row) % 2 == 0:
-            i = 0 if self.empty_pos != 0 and self.empty_pos != 1 else 14
+            i = 2 if self.empty_pos in (0, 1) else 0
             self.tiles[i], self.tiles[i+1] = self.tiles[i+1], self.tiles[i]
 
 
