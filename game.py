@@ -36,11 +36,12 @@ class Game:
                 and tile_index // 4 == self.empty_pos // 4)
                 or abs(tile_index - self.empty_pos) == 4):
             
+            
             (self.tiles[self.empty_pos],
             self.tiles[tile_index]) =  (self.tiles[tile_index],
                                         self.tiles[self.empty_pos])
             self.empty_pos = tile_index
-            
+            self.moves += 1
             return True
         
         return False
