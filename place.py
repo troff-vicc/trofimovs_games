@@ -1,5 +1,6 @@
 import pygame
 from constants import *
+import logs
 
 
 class Place:
@@ -7,6 +8,7 @@ class Place:
     def __init__(self, game):
         pygame.init()
         self.game = game
+        self.logs = logs.Logs()
         self.screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
         pygame.display.set_caption("Пятнашки")
         self.clock = pygame.time.Clock()
@@ -81,6 +83,7 @@ class Place:
     def run(self):
         """Запускает главный игровой цикл"""
         running = True
+        is_win = False
 
         while running:
             for event in pygame.event.get():
@@ -101,13 +104,12 @@ class Place:
                             if 0 <= row < 4 and 0 <= col < 4:
                                 tile_pos = row * 4 + col
                                 self.game.move_tile(tile_pos)
-                        else:
-                            running = False  # Закрыть игру после победы
+                    elif not is_win:
+                        is_win = True
+                        pygame.display.set_caption("Победа")
+                        self.logs.save_result(self.game.moves, self.game.get_time())
             self.draw_place()
-
-            # Если игра завершена - показываем экран победы
-            if self.game.is_solved():
-                pygame.display.set_caption("Победа")
+            
 
             pygame.display.flip()
             self.clock.tick(FPS)

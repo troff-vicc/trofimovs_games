@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 
 class Game:
@@ -7,8 +8,12 @@ class Game:
         self.empty_pos = 15 # Индекс пустой клетки
         self.tiles[15] = 0
         self.moves = 0
+        self.start_time = int(time.time())
         self.shuffle()
-
+    
+    def get_time(self):
+        """Получает текущее время"""
+        return int(time.time()) - self.start_time
 
     def shuffle(self):
         """Перемешивает плитки с гарантией решаемости"""
@@ -42,7 +47,7 @@ class Game:
                                         self.tiles[self.empty_pos])
             self.empty_pos = tile_index
             self.moves += 1
-            return True
+            return self.moves, self.get_time()
         
         return False
         
