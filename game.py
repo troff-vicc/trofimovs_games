@@ -10,11 +10,16 @@ class Game:
         self.moves = 0
         self.start_time = int(time.time())
         self.shuffle()
+        self.game_over = False
+        self.time_now = 0
     
     
     def get_time(self):
         """Получает текущее время"""
-        return int(time.time()) - self.start_time
+        if not self.game_over:
+            self.time_now = int(time.time()) - self.start_time
+        
+        return self.time_now
 
 
     def shuffle(self):
@@ -74,6 +79,7 @@ class Game:
             else abs(tile_index - self.empty_pos) // 4)
         self.empty_pos = tile_index
         
+        self.is_solved()
         return True
         
 
@@ -83,6 +89,7 @@ class Game:
         tilesTrue[15] = 0
         
         if (self.tiles == tilesTrue).all():
+            self.game_over = True
             return True
         
         return False

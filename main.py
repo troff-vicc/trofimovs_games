@@ -1,6 +1,5 @@
 from game import Game
-from place import Place
+import views
 
-if __name__ == "__main__":
-    game_display = Place()  # Передаем логику в отрисовку
-    game_display.run()       # Запускаем игровой цикл
+if __name__ == "__main__": # Передаем логику в отрисовку
+    views.run()    # Запускаем игровой цикл
