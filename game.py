@@ -70,8 +70,8 @@ class Game:
             col[tile_row] = 0  # Обновляем пустую клетку
             self.tiles.reshape(4, 4)[:, empty_col] = col  # Возвращаем столбец обратно
         
-        self.moves += abs(tile_index - self.empty_pos) if tile_row == empty_row \
-            else abs(tile_index - self.empty_pos) // 4
+        self.moves += int(abs(tile_index - self.empty_pos) if tile_row == empty_row \
+            else abs(tile_index - self.empty_pos) // 4)
         self.empty_pos = tile_index
         
         return True
