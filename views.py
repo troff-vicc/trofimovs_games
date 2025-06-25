@@ -13,20 +13,22 @@ class Place:
         pygame.display.set_caption("Пятнашки")
         self.font = pygame.font.SysFont('Arial', FONT_SIZE, bold=True)
         self.small_font = pygame.font.SysFont('Arial', SMALL_FONT_SIZE, bold=True)
+        self.curent_view = 'start'
 
     def draw_view(self):
-        curent_view = 2
-        if curent_view == 1:
-            self.draw_place()
-        else:
+        if self.curent_view == 'start':
             self.draw_start()
+        else:
+            self.draw_place()
 
 
     def draw_place(self):
         """Отрисовываем игровое поле"""
         self.screen.fill(BACKGROUND)
-
-        record_text = self.small_font.render(f"Время: {self.game.get_time()}", True, BLACK)
+        seconds = self.game.get_time()
+        minutes = seconds // 60
+        seconds_remaining = seconds % 60
+        record_text = self.small_font.render(f"Время: {minutes:02d}:{seconds_remaining:02d}", True, BLACK)
         self.screen.blit(record_text, (BORDER_WIDTH,
                                        (SCORE_TEXT + BORDER_WIDTH - record_text.get_height())//2))
 
@@ -119,7 +121,10 @@ class Place:
                                         (WINDOW_SIZE - 2*BORDER_WIDTH - surface_text.get_height())))
 
         """надпись 3 и иконка"""
-        surface_text = self.small_font.render(f"00:45", True, BLACK)
+        seconds = self.logs.record['time_seconds']
+        minutes = seconds // 60
+        seconds_remaining = seconds % 60
+        surface_text = self.small_font.render(f"{minutes:02d}:{seconds_remaining:02d}", True, BLACK)
         self.screen.blit(surface_text, ((WINDOW_SIZE - surface_text.get_width()) // 2,
                                         (WINDOW_SIZE - BORDER_WIDTH - surface_text.get_height())))
         icon = pygame.image.load("medal.png").convert_alpha()
@@ -128,24 +133,29 @@ class Place:
         self.screen.blit(icon, icon_rect)
 
     def event_listen(self, event):
+
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if not self.game.game_over:
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                # Проверяем, что клик внутри игрового поля
-                if (BORDER_WIDTH <= mouse_x < WINDOW_SIZE - BORDER_WIDTH and
-                        BORDER_WIDTH <= mouse_y < WINDOW_SIZE - BORDER_WIDTH):
+            if self.curent_view == 'start':
+                self.curent_view = 'place'
+            else:
+                if not self.game.game_over:
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    # Проверяем, что клик внутри игрового поля
+                    if (BORDER_WIDTH <= mouse_x < WINDOW_SIZE - BORDER_WIDTH and
+                            BORDER_WIDTH <= mouse_y < WINDOW_SIZE - BORDER_WIDTH):
 
-                    # Вычисляем позицию плитки
-                    col = (mouse_x - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
-                    row = (mouse_y - BORDER_WIDTH - SCORE_TEXT) // (TILE_SIZE + TILE_PADDING)
+                        # Вычисляем позицию плитки
+                        col = (mouse_x - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
+                        row = (mouse_y - BORDER_WIDTH - SCORE_TEXT) // (TILE_SIZE + TILE_PADDING)
 
-                    if 0 <= row < 4 and 0 <= col < 4:
-                        tile_pos = row * 4 + col
-                        self.game.move_tile(tile_pos)
+                        if 0 <= row < 4 and 0 <= col < 4:
+                            tile_pos = row * 4 + col
+                            self.game.move_tile(tile_pos)
 
-                if self.game.game_over:
-                    pygame.display.set_caption("Победа")
-                    self.logs.save_result(self.game.moves, self.game.get_time())
+                    if self.game.game_over:
+                        pygame.display.set_caption("Победа")
+                        self.logs.save_result(self.game.moves, self.game.get_time())
+                        self.curent_view = 'start'
 
 
 def run():
