@@ -99,22 +99,33 @@ class Place:
             self.screen.blit(text, text_rect)  # Основной текст
 
     def draw_start(self):
-        """Отрисовываем экран со статистикой"""
+        """Отрисовываем стартовый/финишный экран"""
+
+        """заливаем фон"""
         self.screen.fill(GRAY)
 
-        # Рисуем фон
-        game_field_rect = pygame.Rect(
-            0,
-            0,
-            WINDOW_SIZE,
-            WINDOW_SIZE
-        )
-        pygame.draw.rect(self.screen, GRAY, game_field_rect, border_radius=TILE_RADIUS)
+        """надпись 1"""
+        surface_text = self.font.render(f"Новая игра", True, BLACK)
+        self.screen.blit(surface_text, ((WINDOW_SIZE - surface_text.get_width()) // 2, BORDER_WIDTH))
 
-        record_text = self.small_font.render(f"Статистика игры:", True, BLACK)
-        self.screen.blit(record_text, ((WINDOW_SIZE - record_text.get_width()) // 2,
-                                       (SCORE_TEXT + BORDER_WIDTH - record_text.get_height()) // 2))
+        """кнопка"""
+        button_img = pygame.image.load("playbutton.png")  # PNG с прозрачностью
+        button_rect = button_img.get_rect(center=(WINDOW_SIZE // 2, WINDOW_SIZE // 2))  # Прямоугольник кнопки
+        self.screen.blit(button_img, button_rect)
 
+        """надпись 2"""
+        surface_text = self.small_font.render(f"Рекорд", True, BLACK)
+        self.screen.blit(surface_text, ((WINDOW_SIZE - surface_text.get_width()) // 2,
+                                        (WINDOW_SIZE - 2*BORDER_WIDTH - surface_text.get_height())))
+
+        """надпись 3 и иконка"""
+        surface_text = self.small_font.render(f"00:45", True, BLACK)
+        self.screen.blit(surface_text, ((WINDOW_SIZE - surface_text.get_width()) // 2,
+                                        (WINDOW_SIZE - BORDER_WIDTH - surface_text.get_height())))
+        icon = pygame.image.load("medal.png").convert_alpha()
+        icon_rect = icon.get_rect(center=((WINDOW_SIZE - surface_text.get_width()- icon.get_width()) // 2 ,
+                                        (WINDOW_SIZE - BORDER_WIDTH - surface_text.get_height())))
+        self.screen.blit(icon, icon_rect)
 
     def event_listen(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
