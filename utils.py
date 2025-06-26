@@ -13,8 +13,7 @@ class Logs:
             with open(self.filename, "r") as file:
                 data = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
-            data = {"games": []} # Если файла нет или он пуст, создаём новую структуру
-        
+            data = {"games": []}  # Если файла нет или он пуст, создаём новую структуру
         
         # Добавляем новую запись
         new_game = {
@@ -35,7 +34,7 @@ class Logs:
             return data["games"]
         except (FileNotFoundError, json.JSONDecodeError):
             return []
-        
+    
     def get_record(self):
         games = self.load_results()
         
@@ -48,4 +47,8 @@ class Logs:
         )
         
         return best_game
-    
+
+
+if __name__ == '__main__':
+    log = Logs()
+    lo
