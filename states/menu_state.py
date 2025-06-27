@@ -6,17 +6,22 @@ class MenuState:
     def __init__(self, screen, change_state):
         self.screen = screen
         self.change_state = change_state  # Функция для смены состояния
-        self.font = pygame.font.SysFont('Arial', 36)
-        self.best_game = utils.Logs().record
-        self.button_rect = pygame.Rect(150, 200, 200, 50)
+        self.logs = utils.Logs()
         self.font = pygame.font.SysFont('Arial', FONT_SIZE, bold=True)
         self.small_font = pygame.font.SysFont('Arial', SMALL_FONT_SIZE, bold=True)
-        self.logs = utils.Logs()
+        self.button_rect = None
+        self.best_game = utils.Logs().record
 
     def handle_events(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.change_state("game") # Переключаемся на игру
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # Проверяем, была ли нажата левая кнопка мыши
+            if event.button == 1:  # 1 - левая кнопка мыши
+                # Проверяем, находится ли курсор в пределах кнопки
+                if self.button_rect.collidepoint(event.pos):
+                    self.change_state("game")  # Переключаемся на игру
 
     def update(self):
         pass  # Логика меню (если нужна)
@@ -33,8 +38,8 @@ class MenuState:
         
         """кнопка"""
         button_img = pygame.image.load("resources/playbutton.png")  # PNG с прозрачностью
-        button_rect = button_img.get_rect(center=(WINDOW_SIZE // 2, WINDOW_SIZE // 2))  # Прямоугольник кнопки
-        self.screen.blit(button_img, button_rect)
+        self.button_rect = button_img.get_rect(center=(WINDOW_SIZE // 2, WINDOW_SIZE // 2))  # Прямоугольник кнопки
+        self.screen.blit(button_img, self.button_rect)
         
         """надпись 2"""
         surface_text = self.small_font.render(f"Рекорд", True, BLACK)

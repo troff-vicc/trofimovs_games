@@ -11,6 +11,7 @@ class GameState:
         self.logs = utils.Logs()
         self.font = pygame.font.SysFont('Arial', FONT_SIZE, bold=True)
         self.small_font = pygame.font.SysFont('Arial', SMALL_FONT_SIZE, bold=True)
+        self.button_rect = None
         self.tiles = np.arange(1, 17)  # 1-16 (16 - пустая клетка)
         self.empty_pos = 15  # Индекс пустой клетки
         self.tiles[15] = 0
@@ -19,28 +20,35 @@ class GameState:
         self.shuffle()
         self.game_over = False
         self.time_now = 0
+
     
     def handle_events(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.change_state("menu")
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if not self.game_over:
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                # Проверяем, что клик внутри игрового поля
-                if (BORDER_WIDTH <= mouse_x < WINDOW_SIZE - BORDER_WIDTH and
-                        BORDER_WIDTH <= mouse_y < WINDOW_SIZE - BORDER_WIDTH):
-                    
-                    # Вычисляем позицию плитки
-                    col = (mouse_x - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
-                    row = (mouse_y - BORDER_WIDTH - SCORE_TEXT) // (TILE_SIZE + TILE_PADDING)
-                    
-                    if 0 <= row < 4 and 0 <= col < 4:
-                        tile_pos = row * 4 + col
-                        self.move_tile(tile_pos)
-                
-                if self.game_over:
-                    pygame.display.set_caption("Победа")
+            # Проверяем, была ли нажата левая кнопка мыши
+            if event.button == 1:  # 1 - левая кнопка мыши
+                # Проверяем, находится ли курсор в пределах кнопки
+                if self.button_rect.collidepoint(event.pos):
+                    self.change_state("menu")  # Переключаемся на меню
+                elif not self.game_over:
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    # Проверяем, что клик внутри игрового поля
+                    if (BORDER_WIDTH <= mouse_x < WINDOW_SIZE - BORDER_WIDTH and
+                            BORDER_WIDTH <= mouse_y < WINDOW_SIZE - BORDER_WIDTH):
+
+                        # Вычисляем позицию плитки
+                        col = (mouse_x - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
+                        row = (mouse_y - BORDER_WIDTH - SCORE_TEXT) // (TILE_SIZE + TILE_PADDING)
+
+                        if 0 <= row < 4 and 0 <= col < 4:
+                            tile_pos = row * 4 + col
+                            self.move_tile(tile_pos)
+
+                    if self.game_over:
+                        pygame.display.set_caption("Победа")
+                        self.change_state("menu")
     
     def draw(self):
         """Отрисовываем игровое поле"""
@@ -48,17 +56,21 @@ class GameState:
         seconds = self.get_time()
         minutes = seconds // 60
         seconds_remaining = seconds % 60
-        
+
+        #текст (справа)
         record_text = self.small_font.render(f"Время: {minutes:02d}:{seconds_remaining:02d}",
                                              True, BLACK)
-        self.screen.blit(record_text, (BORDER_WIDTH,
-                                       (SCORE_TEXT + BORDER_WIDTH - record_text.get_height()) // 2))
-        
-        # Второй текст (справа)
         score_text = self.small_font.render(f"Ходы: {self.moves}", True, BLACK)
-        self.screen.blit(score_text, (WINDOW_SIZE // 2,
-                                      (SCORE_TEXT + BORDER_WIDTH - record_text.get_height()) // 2))
-        
+        self.screen.blit(record_text, ((WINDOW_SIZE - BORDER_WIDTH - record_text.get_width() - BORDER_WIDTH - score_text.get_width()),
+                                       (SCORE_TEXT + BORDER_WIDTH - record_text.get_height()) // 2))
+        self.screen.blit(score_text, ((WINDOW_SIZE - BORDER_WIDTH - score_text.get_width()),
+                                      (SCORE_TEXT + BORDER_WIDTH - score_text.get_height()) // 2))
+
+        """кнопка пауза"""
+        button_img = pygame.image.load("resources/pause.png")  # PNG с прозрачностью
+        self.button_rect = button_img.get_rect(topleft=(BORDER_WIDTH, 0))
+        self.screen.blit(button_img, self.button_rect)
+
         # Рисуем белую рамку вокруг игрового поля
         border_rect = pygame.Rect(
             BORDER_WIDTH,
