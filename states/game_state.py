@@ -31,7 +31,7 @@ class GameState:
             if event.button == 1:  # 1 - левая кнопка мыши
                 # Проверяем, находится ли курсор в пределах кнопки
                 if self.button_rect.collidepoint(event.pos):
-                    self.change_state("menu")  # Переключаемся на меню
+                    self.change_state("pause")  # Переключаемся на меню
                 elif not self.game_over:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     # Проверяем, что клик внутри игрового поля
