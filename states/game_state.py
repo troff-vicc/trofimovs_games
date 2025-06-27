@@ -183,8 +183,11 @@ class GameState:
             col[tile_row] = 0  # Обновляем пустую клетку
             self.tiles.reshape(4, 4)[:, empty_col] = col  # Возвращаем столбец обратно
         
-        self.moves += int(abs(tile_index - self.empty_pos) if tile_row == empty_row \
-                              else abs(tile_index - self.empty_pos) // 4)
+        #self.moves += int(abs(tile_index - self.empty_pos) if tile_row == empty_row \
+        #                      else abs(tile_index - self.empty_pos) // 4)
+        
+        self.moves += 1
+        
         self.empty_pos = tile_index
         
         self.is_solved()

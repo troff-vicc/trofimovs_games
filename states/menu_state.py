@@ -32,7 +32,7 @@ class MenuState:
         self.screen.blit(surface_text, ((WINDOW_SIZE - surface_text.get_width()) // 2, BORDER_WIDTH))
         
         """кнопка"""
-        button_img = pygame.image.load("playbutton.png")  # PNG с прозрачностью
+        button_img = pygame.image.load("resources/playbutton.png")  # PNG с прозрачностью
         button_rect = button_img.get_rect(center=(WINDOW_SIZE // 2, WINDOW_SIZE // 2))  # Прямоугольник кнопки
         self.screen.blit(button_img, button_rect)
         
@@ -48,7 +48,7 @@ class MenuState:
         surface_text = self.small_font.render(f"{minutes:02d}:{seconds_remaining:02d}", True, BLACK)
         self.screen.blit(surface_text, ((WINDOW_SIZE - surface_text.get_width()) // 2,
                                         (WINDOW_SIZE - BORDER_WIDTH - surface_text.get_height())))
-        icon = pygame.image.load("medal.png").convert_alpha()
+        icon = pygame.image.load("resources/medal.png").convert_alpha()
         icon_rect = icon.get_rect(center=((WINDOW_SIZE - surface_text.get_width() - icon.get_width()) // 2,
                                           (WINDOW_SIZE - BORDER_WIDTH - surface_text.get_height())))
         self.screen.blit(icon, icon_rect)
