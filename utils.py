@@ -43,7 +43,7 @@ class Logs:
         
         best_game = min(
             games,
-            key=lambda game: game["moves"] * game["time_seconds"]
+            key=lambda game: game["time_seconds"]
         )
         
         return best_game

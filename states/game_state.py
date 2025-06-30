@@ -25,30 +25,27 @@ class GameState:
     def handle_events(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                self.change_state("menu")
+                self.change_state("pause")
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Проверяем, была ли нажата левая кнопка мыши
             if event.button == 1:  # 1 - левая кнопка мыши
                 # Проверяем, находится ли курсор в пределах кнопки
                 if self.button_rect.collidepoint(event.pos):
-                    self.change_state("pause")  # Переключаемся на меню
+                    self.change_state("pause")  # Переключаемся на паузу
                 elif not self.game_over:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     # Проверяем, что клик внутри игрового поля
                     if (BORDER_WIDTH <= mouse_x < WINDOW_SIZE - BORDER_WIDTH and
                             BORDER_WIDTH <= mouse_y < WINDOW_SIZE - BORDER_WIDTH):
-
                         # Вычисляем позицию плитки
                         col = (mouse_x - BORDER_WIDTH) // (TILE_SIZE + TILE_PADDING)
                         row = (mouse_y - BORDER_WIDTH - SCORE_TEXT) // (TILE_SIZE + TILE_PADDING)
-
                         if 0 <= row < 4 and 0 <= col < 4:
                             tile_pos = row * 4 + col
                             self.move_tile(tile_pos)
 
                     if self.game_over:
-                        pygame.display.set_caption("Победа")
-                        self.change_state("menu")
+                        self.change_state("finish")
     
     def draw(self):
         """Отрисовываем игровое поле"""
@@ -194,10 +191,7 @@ class GameState:
             
             col[tile_row] = 0  # Обновляем пустую клетку
             self.tiles.reshape(4, 4)[:, empty_col] = col  # Возвращаем столбец обратно
-        
-        #self.moves += int(abs(tile_index - self.empty_pos) if tile_row == empty_row \
-        #                      else abs(tile_index - self.empty_pos) // 4)
-        
+
         self.moves += 1
         
         self.empty_pos = tile_index

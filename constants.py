@@ -3,8 +3,8 @@ from pygame.examples.aliens import SCORE
 
 BACKGROUND = (255, 255, 255)
 BLACK = (0, 0, 0)
+BLUE = (153, 217, 234)
 GRAY = (200, 200, 200)
-BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 
 # Размеры

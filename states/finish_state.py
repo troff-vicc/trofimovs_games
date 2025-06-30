@@ -2,14 +2,13 @@ import pygame
 import utils
 from constants import *
 
-class PauseState:
+class FinishState:
     def __init__(self, screen, change_state):
         self.screen = screen
         self.change_state = change_state  # Функция для смены состояния
         self.logs = utils.Logs()
         self.font = pygame.font.SysFont('Arial', FONT_SIZE, bold=True)
         self.small_font = pygame.font.SysFont('Arial', SMALL_FONT_SIZE, bold=True)
-        self.continue_rect = None
         self.button_rect = None
         self.best_game = utils.Logs().record
 
@@ -21,12 +20,8 @@ class PauseState:
             # Проверяем, была ли нажата левая кнопка мыши
             if event.button == 1:
                 if self.button_rect.collidepoint(event.pos): #находится ли курсор в пределах кнопки
-                    self.change_state("menu")  # Переключаемся на стартовую страницу
-                else:
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    # Проверяем, что клик внутри кнопки Продолжить
-                    if self.continue_rect.collidepoint(event.pos): #находится ли курсор в пределах кнопки:
-                        self.change_state("game") # Переключаемся на игру
+                    self.change_state("game")  # Переключаемся на стартовую страницу
+
 
     def update(self):
         pass  # Логика меню (если нужна)
@@ -38,32 +33,8 @@ class PauseState:
         self.screen.fill(BLUE)
         
         """надпись 1"""
-        surface_text = self.font.render(f"Пауза", True, BLACK)
+        surface_text = self.font.render(f"Конец игры", True, BLACK)
         self.screen.blit(surface_text, ((WINDOW_SIZE - surface_text.get_width()) // 2, BORDER_WIDTH))
-        
-        """кнопка-надпись"""
-        text = self.font.render(f"ПРОДОЛЖИТЬ", True, RED)
-        text_shadow = self.font.render(f"ПРОДОЛЖИТЬ", True, TILE_SHADOW_COLOR)
-        width_text = text.get_width() + BORDER_WIDTH
-        height_text = text.get_height()
-        x = (WINDOW_SIZE - width_text) // 2
-        y = (WINDOW_SIZE - height_text) // 2 - 2 * BORDER_WIDTH
-        # 1. Рисуем тень (смещенную копию)
-        shadow_rect = pygame.Rect(
-            x + SHADOW_OFFSET,
-            y + SHADOW_OFFSET,
-            width_text,
-            height_text
-        )
-        pygame.draw.rect(self.screen, TILE_SHADOW_COLOR, shadow_rect, border_radius=TILE_RADIUS)
-        # 2. Основная плитка
-        rect = pygame.Rect(x,y, width_text, height_text)
-        self.continue_rect = rect
-        pygame.draw.rect(self.screen, BACKGROUND, rect, border_radius=TILE_RADIUS)
-        # 3. Текст с эффектом вдавленности
-        text_rect = text.get_rect(center=rect.center)
-        self.screen.blit(text_shadow, (text_rect.x + 1, text_rect.y + 1))  # Тень текста
-        self.screen.blit(text, text_rect)  # Основной текст
 
         """кнопка"""
         button_img = pygame.image.load("resources/exit.png")  # PNG с прозрачностью

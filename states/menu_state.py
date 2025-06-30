@@ -30,7 +30,7 @@ class MenuState:
         """Отрисовываем стартовый/финишный экран"""
         
         """заливаем фон"""
-        self.screen.fill(GRAY)
+        self.screen.fill(BLUE)
         
         """надпись 1"""
         surface_text = self.font.render(f"Новая игра", True, BLACK)
