@@ -35,7 +35,17 @@ def main():
 
 
     running = True
+    # Добавляем переменные для таймера
+    logo_start_time = pygame.time.get_ticks()
+    logo_duration = 3000  # 3 секунды в миллисекундах
+    logo_shown = False
     while running:
+
+        current_time = pygame.time.get_ticks()
+        if not logo_shown and current_time - logo_start_time >= logo_duration:
+            states.change_state("menu")
+            logo_shown = True
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

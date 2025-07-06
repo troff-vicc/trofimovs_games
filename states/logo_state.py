@@ -6,14 +6,9 @@ class LogoState:
     def __init__(self, screen, change_state):
         self.screen = screen
         self.change_state = change_state  # Функция для смены состояния
-        self.start_time = time.time()
-
 
     def handle_events(self, event):
-        # Проверяем, прошло ли 5 секунд
-        if time.time() - self.start_time > 5:
-            self.change_state("menu") # Переключаемся на меню
-
+        """меняем в основном цикле main"""
 
     def draw(self):
         
@@ -27,7 +22,7 @@ class LogoState:
         self.screen.blit(logo, logo_rect)
         """надпись"""
         my_font = pygame.font.SysFont('Arial', SMALL_FONT_SIZE, bold=True)
-        surface_text = my_font.render(f"trofimov studio", True, BLACK)
+        surface_text = my_font.render(f"trofimovStudio", True, BLACK)
         self.screen.blit(surface_text, ((WINDOW_SIZE - surface_text.get_width()) // 2,
                                         (WINDOW_SIZE - 2 * BORDER_WIDTH - surface_text.get_height())))
         pygame.display.flip()
