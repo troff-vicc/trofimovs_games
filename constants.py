@@ -16,6 +16,7 @@ TILE_PADDING = 2  # Отступ между плитками
 TILE_SIZE = (WINDOW_SIZE - 2 * BORDER_WIDTH - (4 + 1)*TILE_PADDING) // 4
 FONT_SIZE = TILE_SIZE // 2
 SMALL_FONT_SIZE = 20
+FONT_SIZE_SP = '40sp'
 
 # Эффекты объемности
 TILE_SHADOW_COLOR = (50, 50, 50)  # Цвет тени
