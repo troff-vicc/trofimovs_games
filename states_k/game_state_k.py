@@ -120,7 +120,7 @@ class GameScreen(Screen):
         popup.open()
 
         # Возврат на стартовый экран после закрытия Popup
-        popup.bind(on_dismiss=lambda x: setattr(self.manager, "current", "start"))
+        popup.bind(on_dismiss=lambda x: setattr(self.manager, "current", "finish"))
 
     def get_time(self):
         self.time_now = int(time.time()) - self.start_time
