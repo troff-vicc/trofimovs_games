@@ -21,7 +21,6 @@ class FifteenPuzzleApp(App):
         sm.add_widget(StartScreen(name="start"))
         sm.add_widget(GameScreen(name="game"))
         sm.add_widget(FinishScreen(name="finish"))
-        sm.add_widget(FinishScreen(name="finish"))
         sm.add_widget(LogoScreen(name="logo"))
         
         sm.current = "logo"
