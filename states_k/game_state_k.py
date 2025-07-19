@@ -36,17 +36,34 @@ class GameScreen(Screen):
 
         box_header = BoxLayout(orientation='vertical',
                              size_hint=(1, 0.1),
-                             pos_hint={'top': 1},
+                             pos_hint={'top': 1})
+        """кнопка пауза"""
+        start_btn = Button(
+            background_normal='resources/pause.png',
+            background_down='resources/pause.png',  # Та же картинка при нажатии
+            size_hint=(None, None),  # Отключаем авто-размер
+            pos_hint={'x': 0.05},  # Позиционируем в левом верхнем углу
+        )
+        start_btn.bind(on_press=self.switch_to_menu)
+        box_header.add_widget(start_btn)
+
+        main_layout.add_widget(box_header)
+
+        box_body = BoxLayout(orientation='vertical',
+                             size_hint=(0.9, 0.88),
+                             pos_hint={"center_x": 0.5, 'top': 0.9},
                              spacing=5)
+        with box_body.canvas.before:
+            Color(*kivy_GRAY)
+            box_body.bg_rect = Rectangle(pos=box_body.pos, size=box_body.size)
+        main_layout.add_widget(box_body)
 
         grid_layout = GridLayout(
             cols=4,
             spacing='5dp',
-            size_hint=(0.8, 0.8),
-            pos_hint={"center_x": 0.5, "top": 0.9})
-        with grid_layout.canvas.before:
-            Color(*kivy_GRAY)
-            grid_layout.bg_rect = Rectangle(pos=grid_layout.pos, size=grid_layout.size)
+            size_hint=(0.885, 0.86),
+            pos_hint={"center_x": 0.5, "top": 0.89}) #to-do относительные размеры изменить на относительные отступы
+
 
         numbers = np.arange(1, 17)  # 1-16 (16 - пустая клетка)
         numbers[15] = 0
@@ -77,8 +94,8 @@ class GameScreen(Screen):
         # Привязка изменения размера фона
         main_layout.bind( pos=lambda o, v: setattr(self.bg_rect, 'pos', o.pos),
             size=lambda o, v: setattr(self.bg_rect, 'size', o.size))
-        grid_layout.bind(pos=lambda obj, pos: setattr(grid_layout.bg_rect, 'pos', pos),
-                        size=lambda obj, size: setattr(grid_layout.bg_rect, 'size', size))
+        box_body.bind(pos=lambda obj, pos: setattr(box_body.bg_rect, 'pos', pos),
+                        size=lambda obj, size: setattr(box_body.bg_rect, 'size', size))
 
 
     def shuffle(self,numbers):
@@ -154,3 +171,6 @@ class GameScreen(Screen):
     def get_time(self):
         self.time_now = int(time.time()) - self.start_time
         return self.time_now
+
+    def switch_to_menu(self, instance):
+        self.manager.current = "start" #to-do поменять на menu

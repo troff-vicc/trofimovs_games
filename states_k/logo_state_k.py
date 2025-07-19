@@ -18,7 +18,7 @@ class LogoScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.build_ui()
-        Clock.schedule_once(self.switch_screen, 3)
+        Clock.schedule_once(self.switch_screen, 2)
 
     def build_ui(self):
         kivy_blue = (BLUE[0] / 255, BLUE[1] / 255, BLUE[2] / 255, 1)
