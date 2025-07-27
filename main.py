@@ -1,59 +1,32 @@
-import pygame
-from states.logo_state import LogoState
-from states.menu_state import MenuState
-from states.game_state import GameState
-from states.pause_state import PauseState
-from states.finish_state import FinishState
+from kivy.app import App
+from kivy.uix.screenmanager import ScreenManager
+from kivy.core.window import Window
+from menu_state import StartScreen
+from game_state import GameScreen
+from finish_state import FinishScreen
+from logo_state import LogoScreen
+from pause_state import PauseScreen
 
 
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((600, 600))
-    pygame.display.set_caption("Пятнашки")
-    clock = pygame.time.Clock()
-    
-    states = LogoState(screen, lambda new_state: change_state(new_state))
-    old_ = None
-
-    def change_state(new_state):
-        nonlocal states, old_
-        if new_state == "menu":
-            old_ = None
-            states = MenuState(screen, lambda new_state: change_state(new_state))
-        elif new_state == "pause":
-            old_ = states
-            states = PauseState(screen, lambda new_state: change_state(new_state))
-        elif new_state == "finish":
-            old_ = states
-            states = FinishState(screen, lambda new_state: change_state(new_state))
-        elif new_state == "game":
-            if old_ is None:
-                states = GameState(screen, lambda new_state: change_state(new_state))
-            else:
-                states = old_
-                old_ = None
-
-
-    running = True
-    # Добавляем переменные для таймера
-    logo_start_time = pygame.time.get_ticks()
-    logo_duration = 3000  # 3 секунды в миллисекундах
-    logo_shown = False
-    while running:
-
-        current_time = pygame.time.get_ticks()
-        if not logo_shown and current_time - logo_start_time >= logo_duration:
-            states.change_state("menu")
-            logo_shown = True
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            states.handle_events(event)
+class FifteenPuzzleApp(App):
+    def build(self):
+        # Настройки для Android (полноэкранный режим)
+        Window.size = (480, 860)
+        # Отключаем полноэкранный режим
+        Window.fullscreen = False
+        # Window.fullscreen = 'auto'  # Или 'auto' для адаптации
         
-        states.draw()
-        clock.tick(60)
+        sm = ScreenManager()
+        sm.add_widget(StartScreen(name="start"))
+        sm.add_widget(GameScreen(name="game"))
+        sm.add_widget(FinishScreen(name="finish"))
+        sm.add_widget(LogoScreen(name="logo"))
+        sm.add_widget(PauseScreen(name="pause"))
+        
+        sm.current = "logo"
+        
+        return sm
 
 
 if __name__ == "__main__":
-    main()
+    FifteenPuzzleApp().run()
