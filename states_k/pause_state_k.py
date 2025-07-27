@@ -6,13 +6,41 @@ from kivy.uix.image import Image
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.properties import NumericProperty
+from kivy.properties import ListProperty
 import utils
 from constants import *
 
 
-class StartScreen(Screen):
-    record = NumericProperty(0)  # Для автоматического обновления Label
+class ShadowButton(Button):
+    shadow_color = ListProperty([0, 0, 0, 0.5])
+    shadow_offset = ListProperty([-3, -3])
+    background_color = ListProperty([1, 1, 1, 1])  # Белый фон
 
+    def __init__(self, **kwargs):
+        super(ShadowButton, self).__init__(**kwargs)
+        self.bind(pos=self.update_canvas, size=self.update_canvas)
+
+    def update_canvas(self, *args):
+        self.canvas.before.clear()
+        with self.canvas.before:
+            # Тень
+            Color(*self.shadow_color)
+            RoundedRectangle(
+                pos=(self.x + self.shadow_offset[0], self.y + self.shadow_offset[1]),
+                size=self.size,
+                radius=[10]
+            )
+            # Белый фон
+            Color(*self.background_color)
+            RoundedRectangle(
+                pos=self.pos,
+                size=self.size,
+                radius=[10]
+            )
+
+
+class PauseScreen(Screen):
+    record = NumericProperty(0)  # Для автоматического обновления Label
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -87,37 +115,44 @@ class StartScreen(Screen):
             btn.bind(pos=update_graphics, size=update_graphics)
             layout.add_widget(btn)
 
-
         # Создаем горизонтальный layout 1
         h_layout = BoxLayout(orientation='horizontal', size_hint=(0.9, 0.11),
                              pos_hint={'center_x': 0.5, 'top': 0.9},
                              spacing=5)
-        letters = ["Н", "о", "в", "а", "я"]
+        letters = ["П", "а", "у", "з", "а"]
         for i, letter in enumerate(letters):
             draw_letter(h_layout, letter)
         main_layout.add_widget(h_layout)
 
         # Создаем горизонтальный layout 2
-        h_layout = BoxLayout(orientation='horizontal', size_hint=(0.7, 0.11),
-                             pos_hint={'center_x': 0.5, 'top': 0.75},
-                             spacing=5)
-        letters = ["и", "г", "р", "а"]
-        for i, letter in enumerate(letters):
-            draw_letter(h_layout, letter)
-        main_layout.add_widget(h_layout)
+        h_layout = BoxLayout(orientation='horizontal', size_hint=(0.9, 0.11),
+                             pos_hint={'center_x': 0.5, 'top': 0.5},
+                             spacing=55)
 
-        # Кнопка запуска
-        start_btn = Button(
-            size_hint=(0.65, 0.2),
-            pos_hint={'center_x': 0.5, 'y': 0.3},
-            background_normal='resources/playbutton.png',
-            background_down='resources/playbutton.png',  # Та же картинка при нажатии
+        """кнопка ВОЗВРАТ"""
+        back_btn = ShadowButton(
+            #size_hint=(0.2, 1),
+            pos_hint={'center_x': 0.2, 'y': 0.9},
+            background_normal='resources/back.png',
+            background_down='resources/back.png',  # Та же картинка при нажатии
             border=(0, 0, 0, 0)  # Убираем границы кнопки
         )
-        start_btn.bind(on_press=self.switch_to_game)
-        main_layout.add_widget(start_btn)
+        back_btn.bind(on_press=self.switch_to_game)
+        h_layout.add_widget(back_btn)
+        """кнопка ДОМОЙ"""
+        house_btn = ShadowButton(
+            #size_hint=(0.2, 1),
+            pos_hint={'center_x': 0.8, 'y': 0.9},
+            background_normal='resources/house.png',
+            background_down='resources/house.png',  # Та же картинка при нажатии
+            border=(0, 0, 0, 0)  # Убираем границы кнопки
+        )
+        house_btn.bind(on_press=self.switch_to_home)
+        h_layout.add_widget(house_btn)
 
-        # Создаем горизонтальный layout 4
+        main_layout.add_widget(h_layout)
+
+        # Создаем горизонтальный layout 3
         h_layout = BoxLayout(orientation='horizontal',
                              size_hint=(0.3, 0.2),
                              pos_hint={'center_x': 0.4, 'top': 0.25},
@@ -127,12 +162,12 @@ class StartScreen(Screen):
                              size_hint=(0.7, 0.35),
                              pos_hint={'center_x': 0.25, 'top': 0.6},
                              spacing=5
-        )
+                             )
         # Добавляем медаль
         medal = Image(source='resources/medal.png', allow_stretch=True, keep_ratio=True, size_hint=(0.9, 0.9))
         h_layout.add_widget(medal)
         # Добавляем надпись с рекордом
-        record_label = Label( text=f"Рекорд", font_size='20sp', color=BLACK, bold=True)
+        record_label = Label(text=f"Рекорд", font_size='20sp', color=BLACK, bold=True)
         # Добавляем надпись со временем
         time_label = Label(text=f"{self.on_record()}", font_size='20sp', color=BLACK, bold=True)
         v_layout.add_widget(record_label)
@@ -149,16 +184,19 @@ class StartScreen(Screen):
             size=lambda o, v: setattr(self.bg_rect, 'size', o.size)
         )
 
-
-
     def load_record(self):
         self.record = self.logs.record['time_seconds']
 
     def switch_to_game(self, instance):
         self.manager.current = "game"
 
+    def switch_to_home(self, instance):
+        self.manager.current = "start"
+
     def on_record(self, *args):
         seconds = self.logs.record['time_seconds']
         minutes = seconds // 60
         seconds_remaining = seconds % 60
         return f"{minutes:02d}:{seconds_remaining:02d}"
+
+

@@ -20,7 +20,6 @@ class GameState:
         self.shuffle()
         self.game_over = False
         self.time_now = 0
-
     
     def handle_events(self, event):
         if event.type == pygame.KEYDOWN:

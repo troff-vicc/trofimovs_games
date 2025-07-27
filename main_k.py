@@ -5,6 +5,7 @@ from states_k.menu_state_k import StartScreen
 from states_k.game_state_k import GameScreen
 from states_k.finish_state_k import FinishScreen
 from states_k.logo_state_k import LogoScreen
+from states_k.pause_state_k import PauseScreen
 
 
 
@@ -22,6 +23,7 @@ class FifteenPuzzleApp(App):
         sm.add_widget(GameScreen(name="game"))
         sm.add_widget(FinishScreen(name="finish"))
         sm.add_widget(LogoScreen(name="logo"))
+        sm.add_widget(PauseScreen(name="pause"))
         
         sm.current = "logo"
         
