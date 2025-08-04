@@ -11,10 +11,10 @@ from pause_state import PauseScreen
 class FifteenPuzzleApp(App):
     def build(self):
         # Настройки для Android (полноэкранный режим)
-        Window.size = (480, 860)
+        # Window.size = (480, 860)
         # Отключаем полноэкранный режим
-        Window.fullscreen = False
-        # Window.fullscreen = 'auto'  # Или 'auto' для адаптации
+        # Window.fullscreen = False
+        Window.fullscreen = 'auto'  # Или 'auto' для адаптации
         
         sm = ScreenManager()
         sm.add_widget(StartScreen(name="start"))

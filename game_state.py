@@ -8,7 +8,7 @@ from kivy.metrics import dp
 from kivy.utils import get_color_from_hex
 from kivy.animation import Animation, Parallel
 from kivy.uix.popup import Popup
-from kivy.properties import ListProperty
+from kivy.properties import NumericProperty, StringProperty
 from kivy.graphics import Color, RoundedRectangle, Rectangle
 import numpy as np
 import utils, time
@@ -29,7 +29,6 @@ Builder.load_string("""
             pos: self.pos
             size: self.size
             radius: [self.border_radius,]
-
 <GameScreen>:
     game_layout: game_layout
     BoxLayout:
@@ -46,30 +45,76 @@ Builder.load_string("""
         # Верхняя панель (10% экрана)
         BoxLayout:
             size_hint_y: 0.1
+            size_hint_x: None
+            width: min(dp(400), self.parent.width * 0.95)
+            pos_hint: {'center_x': 0.5}
             padding: dp(10)
             spacing: dp(10)
 
-            Button:
-                text: 'Назад'
-                size_hint_x: 0.2
-                background_color: root.button_color
-                background_normal: ''
-                color: 1, 1, 1, 1
-                font_size: dp(24)
-                on_press: root.back_button_pressed()
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: dp(20)
+                
+                Button:
+                    icon: 'resources/pause.png' 
+                    size_hint: None, None
+                    size: dp(48), dp(48)
+                    background_normal: ''  
+                    background_color: 1, 1, 1, 1  # Прозрачный фон
+                    on_press: root.back_button_pressed()
+                    
+                # Пустой виджет для отступа (заберёт всё свободное пространство)
+                Widget:
+                    size_hint_x: None  # Фиксированная ширина
+                    width: dp(100)     # Настройте под ваш дизайн
+                    
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: dp(2)
 
-            Label:
-                text: 'Очки: 0'
-                halign: 'center'
-                valign: 'middle'
-                size_hint_x: 0.8
-                font_size: dp(32)
-                bold: True
-                color: 0, 0, 0, 1
+                    Label:
+                        text: 'Ходы'
+                        font_size: dp(12)
+                        color: root.text_color
+                        size_hint_y: None
+                        height: self.texture_size[1]
+
+                    Label:
+                        text: '{}'.format(root.moves)
+                        font_size: dp(24)
+                        bold: True
+                        color: 0, 0, 0, 1
+                        size_hint_y: None
+                        height: self.texture_size[1]
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: dp(2)
+
+                    Label:
+                        text: 'Время'
+                        font_size: dp(12)
+                        color: root.text_color
+                        size_hint_y: None
+                        height: self.texture_size[1]
+
+                    Label:
+                        text: root.format_time(root.time_now)
+                        font_size: dp(24)
+                        bold: True
+                        color: 0, 0, 0, 1
+                        size_hint_y: None
+                        height: self.texture_size[1]
 
         # Центральная часть с квадратной сеткой 4x4 (80% экрана)
         FloatLayout:
             size_hint_y: 0.8
+            canvas.before:
+                Color:
+                    rgba: root.background_grid_color
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
 
             GridLayout:
                 id: grid
@@ -77,7 +122,7 @@ Builder.load_string("""
                 rows: 4
                 spacing: dp(15)
                 size_hint: None, None
-                width: self.parent.width * 0.95
+                width: min(dp(400), self.parent.width * 0.95)
                 height: self.width
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
@@ -85,7 +130,6 @@ Builder.load_string("""
         BoxLayout:
             size_hint_y: 0.1
 """)
-
 
 def draw_letter(layout, letter, on_press_def):
     # to-do необходимо цвета хранить в константах
@@ -150,17 +194,25 @@ def draw_letter(layout, letter, on_press_def):
 
 
 class GameScreen(Screen):
-    background_color = get_color_from_hex('#ecf0f1')  # Светло-серый фон
-    button_color = get_color_from_hex('#7f8c8d')     # Темно-серый для кнопок
+    background_color = get_color_from_hex('#F0FDF5')
+    text_color = get_color_from_hex('#6B7280')
+    background_grid_color = get_color_from_hex('#DCEEE9')
+    moves = NumericProperty(0)
+    time_now = NumericProperty(0)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.moves = 0
         self.empty_pos = (3,3)
         self.tiles = []
         self.logs = utils.Logs()
         self.start_time = int(time.time())
         self.create_grid_buttons()
+
+    def on_size(self, *args):
+        # Обновляем размеры при изменении размера экрана
+        grid = self.ids.grid
+        grid.width = min(dp(400), self.width * 0.95)
+        grid.height = grid.width
 
     def create_grid_buttons(self):
 
@@ -203,7 +255,7 @@ class GameScreen(Screen):
         self.empty_pos = divmod(empty_pos, 4)
 
     def back_button_pressed(self):
-        self.manager.current = "pause"  # to-do поменять на menu
+        self.manager.current = "pause"
 
     def move_tile(self, instance):
         idx = self.tiles.index(instance)
@@ -270,6 +322,7 @@ class GameScreen(Screen):
             self.tiles[empty_idx] = clicked_tile
             self.empty_pos = (row, col)
             self.moves += 1
+            self.get_time()
             empty_tile.pos = pos2
             clicked_tile.pos = pos1
 
@@ -315,4 +368,7 @@ class GameScreen(Screen):
         self.time_now = int(time.time()) - self.start_time
         return self.time_now
 
-
+    def format_time(self, seconds):
+        minutes = seconds // 60  # Целочисленное деление вместо math.floor
+        seconds = seconds % 60   # Остаток от деления
+        return f"{minutes:02d}:{seconds:02d}"
