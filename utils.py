@@ -33,7 +33,11 @@ class Logs:
                 data = json.load(file)
             return data["games"]
         except (FileNotFoundError, json.JSONDecodeError):
-            return []
+            return [{
+                "date": 0,
+                "moves": 0,
+                "time_seconds": 0
+            }]
     
     def get_record(self):
         games = self.load_results()
@@ -51,4 +55,4 @@ class Logs:
 
 if __name__ == '__main__':
     log = Logs()
-    lo
+    

@@ -13,7 +13,6 @@ from constants import *
 class StartScreen(Screen):
     record = NumericProperty(0)  # Для автоматического обновления Label
 
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.logs = utils.Logs()
@@ -148,8 +147,6 @@ class StartScreen(Screen):
             pos=lambda o, v: setattr(self.bg_rect, 'pos', o.pos),
             size=lambda o, v: setattr(self.bg_rect, 'size', o.size)
         )
-
-
 
     def load_record(self):
         self.record = self.logs.record['time_seconds']

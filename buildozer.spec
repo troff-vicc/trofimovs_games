@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,certifi,charset-normalizer,docutils,filetype,idna,Kivy-Garden,numpy,Pygments,requests,urllib3
+requirements = python3,kivy,numpy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -104,7 +104,7 @@ fullscreen = 1
 #android.api = 31
 
 # (int) Minimum API your APK / AAB will support.
-#android.minapi = 21
+android.minapi = 24
 
 # (int) Android SDK version to use
 #android.sdk = 20
@@ -321,7 +321,7 @@ android.allow_backup = True
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-#p4a.branch = develop
+p4a.branch = develop
 
 # (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
 #p4a.commit = HEAD

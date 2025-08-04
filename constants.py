@@ -1,5 +1,4 @@
 # Цвета
-from pygame.examples.aliens import SCORE
 from kivy.core.window import Window
 
 BACKGROUND = (255, 255, 255)
