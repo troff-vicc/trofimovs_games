@@ -156,38 +156,38 @@ class GameScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.moves = 0
-        self.empty_pos = (3,3)
+        self.empty_pos = (3, 3)
         self.tiles = []
         self.logs = utils.Logs()
         self.start_time = int(time.time())
+        self.time_now = self.get_time()
+        self.numbers = np.arange(1, 17)
+        self.numbers[15] = 0
         self.create_grid_buttons()
-
+        
     def create_grid_buttons(self):
-
+        self.ids.grid.clear_widgets()
         grid = self.ids.grid
-        numbers = np.arange(1, 17)  # 1-16 (16 - пустая клетка)
-        numbers[15] = 0
-        self.shuffle(numbers)
+        
+        self.shuffle()
 
         for i in range(16):
-            num = numbers[i]
+            num = self.numbers[i]
             if num != 0:
                 btn = draw_letter(grid, str(num), lambda x: self.move_tile(x))
                 self.tiles.append(btn)
-                #grid.add_widget(btn)
             else:
                 # Добавляем невидимый виджет для сохранения позиции
                 empty = Label(size_hint=(1, 1), opacity=0)
                 self.tiles.append(empty)
                 grid.add_widget(empty)
 
-
-    def shuffle(self,numbers):
+    def shuffle(self):
         """Перемешивает плитки с гарантией решаемости"""
-        np.random.shuffle(numbers)
-        indexO = np.where(numbers == 0)
+        np.random.shuffle(self.numbers)
+        indexO = np.where(self.numbers == 0)
         empty_pos = indexO[0][0]
-        tiles_o = numbers[numbers != 0]
+        tiles_o = self.numbers[self.numbers != 0]
 
         inversions = 0
         for i in range(15):
@@ -198,12 +198,9 @@ class GameScreen(Screen):
         empty_row = empty_pos // 4
         if (inversions + empty_row) % 2 == 0:
             i = 2 if empty_pos in (0, 1) else 0
-            numbers[i], numbers[i + 1] = numbers[i + 1], numbers[i]
+            self.numbers[i], self.numbers[i + 1] = self.numbers[i + 1], self.numbers[i]
 
         self.empty_pos = divmod(empty_pos, 4)
-
-    def back_button_pressed(self):
-        self.manager.current = "pause"  # to-do поменять на menu
 
     def move_tile(self, instance):
         idx = self.tiles.index(instance)
@@ -214,69 +211,63 @@ class GameScreen(Screen):
         if not (row == empty_row or col == empty_col):
             return False  # Невозможно переместить
 
-        """def movieOneStep(idx_1, idx_2):
-            clicked_tile = self.tiles[idx_1]
-            empty_tile = self.tiles[idx_2]
-
-            # Анимация перемещения
-            pos1 = empty_tile.pos.copy()
-            pos2 = clicked_tile.pos.copy()
-            Animation(pos=pos1, duration=0.15).start(clicked_tile)
-            Animation(pos=pos2, duration=0.15).start(empty_tile)
-            # Меняем плитки местами в списке
-            self.tiles[idx_1] = empty_tile
-            self.tiles[idx_2] = clicked_tile
-
-            empty_tile.pos = pos2
-            clicked_tile.pos = pos1
-            print(f'пустая в {idx_1} а кнопка в {idx_2}')
-            print(f'позиция пустой {pos2} а кнопка в {pos1}')
-
-        # Горизонтальное движение (в строке)
         if row == empty_row:
-            cur_empty = empty_col
-            cur_idx = idx
-            steps = 0
+            row1 = self.numbers.reshape(4, 4)[empty_row, :]
+            
             if col > empty_col:
-                while col > cur_empty:
-                    movieOneStep(cur_idx,cur_idx-1)
-                    steps +=1
-                    cur_empty +=1
-                    cur_idx +=1
-
+                row1[empty_col:col] = row1[empty_col + 1:col + 1]
             else:
-                while col < cur_empty:
-                    movieOneStep(cur_idx,cur_idx+1)
-                    steps +=1
-                    cur_empty -=1
-                    cur_idx -=1
-
-
-            self.empty_pos = (row, col)
-            self.moves += steps"""
-
-        if (abs(row - empty_row) == 1 and col == empty_col) or (abs(col - empty_col) == 1 and row == empty_row):
+                row1[col + 1:empty_col + 1] = row1[col:empty_col]
+            
+            row1[col] = 0  # Обновляем пустую клетку
+            self.numbers.reshape(4, 4)[empty_row, :] = row1
+        elif col == empty_col:
+            col1 = self.numbers.reshape(4, 4)[:, empty_col]
+            
+            if row > empty_row:
+                col1[empty_row:row] = col1[empty_row + 1:row + 1]
+            else:
+                col1[row + 1:empty_row + 1] = col1[row:empty_row]
+            
+            col1[row] = 0  # Обновляем пустую клетку
+            self.numbers.reshape(4, 4)[:, empty_col] = col1
+        
+        if row == empty_row or col == empty_col:
             empty_idx = empty_row * 4 + empty_col
-            clicked_tile = self.tiles[idx]
+            
+            step = 1 if row == empty_row else 4
+            i = (idx - empty_idx)//abs(idx - empty_idx)
+            step *= i
+            
+            list_idx = [idx_n for idx_n in range(empty_idx, idx+i, step)]
             empty_tile = self.tiles[empty_idx]
-
-            # Анимация перемещения
-            pos1 = empty_tile.pos.copy()
-            pos2 = clicked_tile.pos.copy()
-            Animation(pos=pos1, duration=0.15).start(clicked_tile)
-            Animation(pos=pos2, duration=0.15).start(empty_tile)
-            # Меняем плитки местами в списке
-            self.tiles[idx] = empty_tile
-            self.tiles[empty_idx] = clicked_tile
-            self.empty_pos = (row, col)
+            
+            for idx_one in list_idx[1:]:
+                tiles_one = self.tiles[idx_one]
+                pos1 = empty_tile.pos.copy()
+                pos2 = tiles_one.pos.copy()
+                
+                Animation(pos=pos1, duration=0.15).start(tiles_one)
+                Animation(pos=pos2, duration=0.15).start(empty_tile)
+                
+                self.tiles[idx_one] = empty_tile
+                self.tiles[empty_idx] = tiles_one
+                
+                empty_tile.pos = pos2
+                tiles_one.pos = pos1
+                
+                empty_idx = idx_one
+                self.empty_pos = divmod(idx_one, 4)
+            
             self.moves += 1
-            empty_tile.pos = pos2
-            clicked_tile.pos = pos1
 
             # Проверка победы
             if self.check_win():
                 self.handle_win()
-
+                
+    def back_button_pressed(self):
+        self.manager.current = "pause"  # to-do поменять на menu
+        
     def check_win(self):
         """Проверка победы"""
         tilesTrue = np.arange(1, 17)
@@ -290,7 +281,6 @@ class GameScreen(Screen):
                 tilesCurrent = np.append(tilesCurrent, 0)
 
         if (tilesCurrent == tilesTrue).all():
-            self.game_over = True
             self.logs.save_result(self.moves, self.get_time())
             return True
 
