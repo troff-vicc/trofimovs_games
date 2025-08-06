@@ -6,6 +6,7 @@ from kivy.uix.image import Image
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.properties import NumericProperty
+from kivy.utils import get_color_from_hex
 import utils
 from constants import *
 
@@ -20,7 +21,8 @@ class StartScreen(Screen):
         self.build_ui()
 
     def build_ui(self):
-        kivy_blue = (BLUE[0] / 255, BLUE[1] / 255, BLUE[2] / 255, 1)
+        #kivy_blue = (BLUE[0] / 255, BLUE[1] / 255, BLUE[2] / 255, 1)
+        kivy_blue = get_color_from_hex('#F0FDF5')
         kivy_red = (RED[0] / 255, RED[1] / 255, RED[2] / 255, 1)
         kivy_BACKGROUND = (BACKGROUND[0] / 255, BACKGROUND[1] / 255, BACKGROUND[2] / 255, 1)
         # Главный контейнер

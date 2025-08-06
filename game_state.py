@@ -4,31 +4,25 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.image import Image
 from kivy.metrics import dp
 from kivy.utils import get_color_from_hex
 from kivy.animation import Animation, Parallel
 from kivy.uix.popup import Popup
 from kivy.properties import NumericProperty, StringProperty
 from kivy.graphics import Color, RoundedRectangle, Rectangle
+from kivy.clock import Clock
 import numpy as np
 import utils, time
 from constants import *
 
 Builder.load_string("""
-<FlatButton>:
-    canvas.before:
-        Color:
-            rgba: self.shadow_color
-        RoundedRectangle:
-            pos: self.pos[0]-self.shadow_offset, self.pos[1]-self.shadow_offset
-            size: self.size[0]+self.shadow_offset*2, self.size[1]+self.shadow_offset*2
-            radius: [self.border_radius + self.shadow_offset,]
-        Color:
-            rgba: self.background_color
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
-            radius: [self.border_radius,]
+<ImageButton>:
+    keep_ratio: True
+    allow_stretch: True
+
+
 <GameScreen>:
     game_layout: game_layout
     BoxLayout:
@@ -54,29 +48,37 @@ Builder.load_string("""
             BoxLayout:
                 orientation: 'horizontal'
                 spacing: dp(20)
-                
-                Button:
-                    icon: 'resources/pause.png'
+                padding: [dp(20), dp(20), dp(20), 0]
+                pos_hint: {'center_y': 0.5}  # Центрирование по вертикали
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [dp(15),]
+
+                ImageButton:
                     size_hint: None, None
-                    size: dp(48), dp(48)
-                    background_normal: ''
-                    background_color: 1, 1, 1, 1  # Прозрачный фон
+                    size: dp(40), dp(40)
+                    source: 'resources/pause.png'
                     on_press: root.back_button_pressed()
-                    
-                # Пустой виджет для отступа (заберёт всё свободное пространство)
+                    pos_hint: {'center_y': 0.5}
+
+                # Пустой виджет для отступа
                 Widget:
-                    size_hint_x: None  # Фиксированная ширина
-                    width: dp(100)     # Настройте под ваш дизайн
-                    
+                    size_hint_x: None
+                    width: dp(100)
+
                 BoxLayout:
                     orientation: 'vertical'
                     spacing: dp(2)
+                    pos_hint: {'center_y': 0.5}  # Центрирование блока
 
                     Label:
                         text: 'Ходы'
                         font_size: dp(12)
                         color: root.text_color
-                        size_hint_y: None
                         height: self.texture_size[1]
 
                     Label:
@@ -84,18 +86,17 @@ Builder.load_string("""
                         font_size: dp(24)
                         bold: True
                         color: 0, 0, 0, 1
-                        size_hint_y: None
                         height: self.texture_size[1]
 
                 BoxLayout:
                     orientation: 'vertical'
                     spacing: dp(2)
+                    pos_hint: {'center_y': 0.5}  # Центрирование блока
 
                     Label:
                         text: 'Время'
                         font_size: dp(12)
                         color: root.text_color
-                        size_hint_y: None
                         height: self.texture_size[1]
 
                     Label:
@@ -103,18 +104,22 @@ Builder.load_string("""
                         font_size: dp(24)
                         bold: True
                         color: 0, 0, 0, 1
-                        size_hint_y: None
                         height: self.texture_size[1]
+
 
         # Центральная часть с квадратной сеткой 4x4 (80% экрана)
         FloatLayout:
             size_hint_y: 0.8
+
+            # Фон для GridLayout (закругленный прямоугольник)
             canvas.before:
                 Color:
                     rgba: root.background_grid_color
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+                RoundedRectangle:
+                    # Центрируем фон и задаем размер как у GridLayout
+                    pos: ((self.width - (min(dp(400), self.parent.width * 0.95) - dp(30))) / 2, (self.parent.height - (min(dp(400), self.parent.width * 0.95) - dp(30))) / 2)
+                    size: ((min(dp(400), self.parent.width * 0.95) - dp(30)), (min(dp(400), self.parent.width * 0.95) - dp(30)))
+                    radius: [dp(20),]
 
             GridLayout:
                 id: grid
@@ -122,14 +127,17 @@ Builder.load_string("""
                 rows: 4
                 spacing: dp(15)
                 size_hint: None, None
-                width: min(dp(400), self.parent.width * 0.95)
+                width: min(dp(400), self.parent.width * 0.95) - dp(30)  # Уменьшаем на padding*2
                 height: self.width
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                padding: dp(15)  # Внутренние отступы
+
 
         # Нижняя часть (10% экрана)
         BoxLayout:
             size_hint_y: 0.1
 """)
+
 
 def draw_letter(layout, letter, on_press_def):
     # to-do необходимо цвета хранить в константах
@@ -144,7 +152,7 @@ def draw_letter(layout, letter, on_press_def):
         color=(1, 0, 0, 1),  # Красный текст
         font_size=dp(24),
         bold=True,
-        on_press= on_press_def,
+        on_press=on_press_def,
         size_hint=(1, 1)
     )
 
@@ -193,6 +201,10 @@ def draw_letter(layout, letter, on_press_def):
     return btn
 
 
+class ImageButton(ButtonBehavior, Image):
+    pass
+
+
 class GameScreen(Screen):
     background_color = get_color_from_hex('#F0FDF5')
     text_color = get_color_from_hex('#6B7280')
@@ -206,11 +218,10 @@ class GameScreen(Screen):
         self.empty_pos = (3, 3)
         self.tiles = []
         self.logs = utils.Logs()
-        self.start_time = int(time.time())
-        self.time_now = self.get_time()
         self.numbers = np.arange(1, 17)
         self.numbers[15] = 0
         self.create_grid_buttons()
+
 
     def on_size(self, *args):
         # Обновляем размеры при изменении размера экрана
@@ -218,10 +229,14 @@ class GameScreen(Screen):
         grid.width = min(dp(400), self.width * 0.95)
         grid.height = grid.width
 
+    def on_enter(self, *args):
+        self.start_counter()
+
+
     def create_grid_buttons(self):
         self.ids.grid.clear_widgets()
         grid = self.ids.grid
-        
+
         self.shuffle()
 
         for i in range(16):
@@ -255,8 +270,6 @@ class GameScreen(Screen):
 
         self.empty_pos = divmod(empty_pos, 4)
 
-    def back_button_pressed(self):
-        self.manager.current = "pause"
 
     def move_tile(self, instance):
         idx = self.tiles.index(instance)
@@ -269,62 +282,58 @@ class GameScreen(Screen):
 
         if row == empty_row:
             row1 = self.numbers.reshape(4, 4)[empty_row, :]
-            
+
             if col > empty_col:
                 row1[empty_col:col] = row1[empty_col + 1:col + 1]
             else:
                 row1[col + 1:empty_col + 1] = row1[col:empty_col]
-            
+
             row1[col] = 0  # Обновляем пустую клетку
             self.numbers.reshape(4, 4)[empty_row, :] = row1
         elif col == empty_col:
             col1 = self.numbers.reshape(4, 4)[:, empty_col]
-            
+
             if row > empty_row:
                 col1[empty_row:row] = col1[empty_row + 1:row + 1]
             else:
                 col1[row + 1:empty_row + 1] = col1[row:empty_row]
-            
+
             col1[row] = 0  # Обновляем пустую клетку
             self.numbers.reshape(4, 4)[:, empty_col] = col1
-        
+
         if row == empty_row or col == empty_col:
             empty_idx = empty_row * 4 + empty_col
-            
+
             step = 1 if row == empty_row else 4
-            i = (idx - empty_idx)//abs(idx - empty_idx)
+            i = (idx - empty_idx) // abs(idx - empty_idx)
             step *= i
-            
-            list_idx = [idx_n for idx_n in range(empty_idx, idx+i, step)]
+
+            list_idx = [idx_n for idx_n in range(empty_idx, idx + i, step)]
             empty_tile = self.tiles[empty_idx]
-            
+
             for idx_one in list_idx[1:]:
                 tiles_one = self.tiles[idx_one]
                 pos1 = empty_tile.pos.copy()
                 pos2 = tiles_one.pos.copy()
-                
+
                 Animation(pos=pos1, duration=0.15).start(tiles_one)
                 Animation(pos=pos2, duration=0.15).start(empty_tile)
-                
+
                 self.tiles[idx_one] = empty_tile
                 self.tiles[empty_idx] = tiles_one
-                
+
                 empty_tile.pos = pos2
                 tiles_one.pos = pos1
-                
+
                 empty_idx = idx_one
                 self.empty_pos = divmod(idx_one, 4)
-            
-            self.get_time()
+
             self.moves += 1
 
             # Проверка победы
             if self.check_win():
                 self.handle_win()
-                
-    def back_button_pressed(self):
-        self.manager.current = "pause"  # to-do поменять на menu
-        
+
     def check_win(self):
         """Проверка победы"""
         tilesTrue = np.arange(1, 17)
@@ -338,31 +347,45 @@ class GameScreen(Screen):
                 tilesCurrent = np.append(tilesCurrent, 0)
 
         if (tilesCurrent == tilesTrue).all():
-            self.logs.save_result(self.moves, self.get_time())
+            self.logs.save_result(self.moves, self.time_now)
             return True
 
         return False
 
     def handle_win(self):
 
-        self.logs.save_result(self.moves, self.get_time())
+        self.logs.save_result(self.moves, self.time_now)
+        self.manager.moves_current = self.moves
+        self.manager.time_current = self.time_now
+        self.stop_counter()
+        self.manager.current = "finish"
 
-        # Показываем Popup с результатом
-        popup = Popup(
-            title="Победа!",
-            size_hint=(0.7, 0.4),
-            content=Label(text=f"Вы собрали за {self.moves} ходов!")
-        )
-        popup.open()
 
-        # Возврат на стартовый экран после закрытия Popup
-        popup.bind(on_dismiss=lambda x: setattr(self.manager, "current", "finish"))
-
-    def get_time(self):
-        self.time_now = int(time.time()) - self.start_time
-        return self.time_now
+    def back_button_pressed(self):
+        self.manager.moves_current = self.moves
+        self.manager.time_current = self.time_now
+        self.stop_counter()
+        self.manager.current = "pause"
 
     def format_time(self, seconds):
         minutes = seconds // 60  # Целочисленное деление вместо math.floor
-        seconds = seconds % 60   # Остаток от деления
+        seconds = seconds % 60  # Остаток от деления
         return f"{minutes:02d}:{seconds:02d}"
+
+    def start_counter(self, curent_time=0):
+        # Запускаем обновление счетчика каждую секунду
+        self.clock_event = Clock.schedule_interval(self.update_counter, 1.0)
+        if curent_time==0:
+            self.start_time = int(time.time())
+        else:
+            self.start_time = int(time.time()) - int(curent_time)
+
+    def stop_counter(self):
+        # Останавливаем обновление счетчика
+        if self.clock_event:
+            self.clock_event.cancel()
+            self.clock_event = None
+
+    def update_counter(self, dt):
+        # Эта функция будет вызываться каждую секунду
+        self.time_now = int(time.time()) - self.start_time
