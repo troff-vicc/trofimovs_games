@@ -140,6 +140,7 @@ Builder.load_string('''
                     on_press: root.restart_game()
 ''')
 
+
 class PauseScreen(Screen):
     bg_color = BG_COLOR
     text_color_label = TEXT_COLOR_LABEL
@@ -151,6 +152,7 @@ class PauseScreen(Screen):
     moves = NumericProperty(0)
     time_now = NumericProperty(0)
     #time_now = Screen.time_current
+    
     def on_enter(self, *args):
         seconds = self.manager.time_current
         minutes = seconds // 60

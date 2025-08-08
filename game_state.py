@@ -1,20 +1,19 @@
-from kivy.uix.screenmanager import Screen
-from kivy.lang import Builder
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.button import Button
-from kivy.uix.label import Label
-from kivy.uix.behaviors import ButtonBehavior
-from kivy.uix.image import Image
-from kivy.metrics import dp
-from kivy.utils import get_color_from_hex
-from kivy.animation import Animation, Parallel
-from kivy.uix.popup import Popup
-from kivy.properties import NumericProperty, StringProperty
-from kivy.graphics import Color, RoundedRectangle, Rectangle
-from kivy.clock import Clock
 import numpy as np
-import utils, time
+from kivy.animation import Animation
+from kivy.clock import Clock
+from kivy.graphics import Color, RoundedRectangle
+from kivy.lang import Builder
+from kivy.metrics import dp
+from kivy.properties import NumericProperty
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.button import Button
+from kivy.uix.image import Image
+from kivy.uix.label import Label
+from kivy.uix.screenmanager import Screen
+from kivy.utils import get_color_from_hex
+
+import time
+import utils
 from constants import *
 
 Builder.load_string("""
@@ -214,14 +213,7 @@ class GameScreen(Screen):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.moves = 0
-        self.empty_pos = (3, 3)
-        self.tiles = []
         self.logs = utils.Logs()
-        self.numbers = np.arange(1, 17)
-        self.numbers[15] = 0
-        self.create_grid_buttons()
-
 
     def on_size(self, *args):
         # Обновляем размеры при изменении размера экрана
@@ -229,18 +221,16 @@ class GameScreen(Screen):
         grid.width = min(dp(400), self.width * 0.95)
         grid.height = grid.width
 
-    def on_enter(self, *args):
-        self.start_counter()
-
-
     def create_grid_buttons(self):
         self.ids.grid.clear_widgets()
         grid = self.ids.grid
-
-        self.shuffle()
+        
+        numbers = np.arange(1, 17)  # 1-16 (16 - пустая клетка)
+        numbers[15] = 0
+        self.shuffle(numbers)
 
         for i in range(16):
-            num = self.numbers[i]
+            num = numbers[i]
             if num != 0:
                 btn = draw_letter(grid, str(num), lambda x: self.move_tile(x))
                 self.tiles.append(btn)
@@ -250,12 +240,12 @@ class GameScreen(Screen):
                 self.tiles.append(empty)
                 grid.add_widget(empty)
 
-    def shuffle(self):
+    def shuffle(self, numbers):
         """Перемешивает плитки с гарантией решаемости"""
-        np.random.shuffle(self.numbers)
-        indexO = np.where(self.numbers == 0)
+        np.random.shuffle(numbers)
+        indexO = np.where(numbers == 0)
         empty_pos = indexO[0][0]
-        tiles_o = self.numbers[self.numbers != 0]
+        tiles_o = numbers[numbers != 0]
 
         inversions = 0
         for i in range(15):
@@ -266,10 +256,9 @@ class GameScreen(Screen):
         empty_row = empty_pos // 4
         if (inversions + empty_row) % 2 == 0:
             i = 2 if empty_pos in (0, 1) else 0
-            self.numbers[i], self.numbers[i + 1] = self.numbers[i + 1], self.numbers[i]
+            numbers[i], numbers[i + 1] = numbers[i + 1], numbers[i]
 
         self.empty_pos = divmod(empty_pos, 4)
-
 
     def move_tile(self, instance):
         idx = self.tiles.index(instance)
@@ -279,27 +268,6 @@ class GameScreen(Screen):
         # Проверяем, что плитка в одной строке или столбце с пустой клеткой
         if not (row == empty_row or col == empty_col):
             return False  # Невозможно переместить
-
-        if row == empty_row:
-            row1 = self.numbers.reshape(4, 4)[empty_row, :]
-
-            if col > empty_col:
-                row1[empty_col:col] = row1[empty_col + 1:col + 1]
-            else:
-                row1[col + 1:empty_col + 1] = row1[col:empty_col]
-
-            row1[col] = 0  # Обновляем пустую клетку
-            self.numbers.reshape(4, 4)[empty_row, :] = row1
-        elif col == empty_col:
-            col1 = self.numbers.reshape(4, 4)[:, empty_col]
-
-            if row > empty_row:
-                col1[empty_row:row] = col1[empty_row + 1:row + 1]
-            else:
-                col1[row + 1:empty_row + 1] = col1[row:empty_row]
-
-            col1[row] = 0  # Обновляем пустую клетку
-            self.numbers.reshape(4, 4)[:, empty_col] = col1
 
         if row == empty_row or col == empty_col:
             empty_idx = empty_row * 4 + empty_col
@@ -353,13 +321,11 @@ class GameScreen(Screen):
         return False
 
     def handle_win(self):
-
         self.logs.save_result(self.moves, self.time_now)
         self.manager.moves_current = self.moves
         self.manager.time_current = self.time_now
         self.stop_counter()
         self.manager.current = "finish"
-
 
     def back_button_pressed(self):
         self.manager.moves_current = self.moves
@@ -370,15 +336,17 @@ class GameScreen(Screen):
     def format_time(self, seconds):
         minutes = seconds // 60  # Целочисленное деление вместо math.floor
         seconds = seconds % 60  # Остаток от деления
-        return f"{minutes:02d}:{seconds:02d}"
-
-    def start_counter(self, curent_time=0):
-        # Запускаем обновление счетчика каждую секунду
+        return f'{minutes:02d}:{seconds:02d}'
+    
+    def start_counter(self, current_time=0):
+        self.tiles = []
+        self.moves = 0
+        self.empty_pos = (3, 3)
         self.clock_event = Clock.schedule_interval(self.update_counter, 1.0)
-        if curent_time==0:
+        if current_time == 0:
             self.start_time = int(time.time())
         else:
-            self.start_time = int(time.time()) - int(curent_time)
+            self.start_time = int(time.time()) - int(current_time)
 
     def stop_counter(self):
         # Останавливаем обновление счетчика
@@ -389,3 +357,4 @@ class GameScreen(Screen):
     def update_counter(self, dt):
         # Эта функция будет вызываться каждую секунду
         self.time_now = int(time.time()) - self.start_time
+    
