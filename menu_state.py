@@ -25,6 +25,9 @@ class StartScreen(Screen):
 
     def on_enter(self, *args):
         self.play_sound()
+
+    def on_leave(self):
+        self.stop_sound()
     
     def build_ui(self):
         #kivy_blue = (BLUE[0] / 255, BLUE[1] / 255, BLUE[2] / 255, 1)
@@ -160,7 +163,15 @@ class StartScreen(Screen):
 
     def play_sound(self):
         if self.move_sound:
+            self.move_sound.loop = True  # Зацикливание музыки
             self.move_sound.play()
+
+    def stop_sound(self):
+        # Останавливаем звук при уходе с экрана
+        if self.move_sound:
+            self.move_sound.stop()
+            """self.move_sound.unload()
+            self.move_sound = None"""
 
     def switch_to_game(self, instance):
         game = self.manager.get_screen('game')

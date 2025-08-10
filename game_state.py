@@ -11,7 +11,8 @@ from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.utils import get_color_from_hex, platform
-from plyer import vibrator
+from kivy.uix.popup import Popup
+from jnius import autoclass, PythonJavaClass, java_method
 
 import time
 import utils
@@ -204,6 +205,31 @@ def draw_letter(layout, letter, on_press_def):
 class ImageButton(ButtonBehavior, Image):
     pass
 
+class VibratorService:
+    def __init__(self):
+        self.service = None
+        if platform == 'android':
+            try:
+                Context = autoclass('android.content.Context')
+                PythonActivity = autoclass('org.kivy.android.PythonActivity')
+                self.service = PythonActivity.mActivity.getSystemService(Context.VIBRATOR_SERVICE)
+            except Exception as e:
+                print(f"Vibrator init error: {e}")
+
+    def vibrate(self, duration=0.3):
+        if not self.service:
+            return False
+
+        try:
+            # Для Android API 26+ (Oreo)
+            if hasattr(self.service, 'vibrate') and hasattr(self.service, 'hasVibrator'):
+                if self.service.hasVibrator():
+                    self.service.vibrate(int(duration * 1000))
+                    return True
+            return False
+        except Exception as e:
+            print(f"Vibration error: {e}")
+            return False
 
 class GameScreen(Screen):
     background_color = get_color_from_hex('#F0FDF5')
@@ -216,6 +242,7 @@ class GameScreen(Screen):
         super().__init__(**kwargs)
         self.logs = utils.Logs()
         self.pos_tiles = []
+        self.vibrator = VibratorService()
 
 
     def on_size(self, *args):
@@ -312,8 +339,8 @@ class GameScreen(Screen):
 
     def vibrate(self):
         if platform == 'android':
-            vibrator.vibrate(time=0.1)
-
+            if not self.vibrator.vibrate(0.1):
+                self.show_error("Вибратор недоступен!\nПроверьте разрешения")
 
     def check_win(self):
         """Проверка победы"""
@@ -376,3 +403,11 @@ class GameScreen(Screen):
     def update_counter(self, dt):
         # Эта функция будет вызываться каждую секунду
         self.time_now = int(time.time()) - self.start_time
+
+    def show_error(self, message):
+        popup = Popup(
+            title="Ошибка вибрации",
+            size_hint=(0.8, 0.4),
+            content=Label(text=message)
+        )
+        popup.open()
