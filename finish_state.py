@@ -3,6 +3,7 @@ from kivy.lang import Builder
 from kivy.properties import NumericProperty
 from kivy.utils import get_color_from_hex
 from kivy.metrics import dp
+from kivy.core.audio import SoundLoader
 import utils
 from constants import *
 
@@ -173,6 +174,11 @@ class FinishScreen(Screen):
     moves = NumericProperty(0)
     time_now = NumericProperty(0)
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.record_sound = SoundLoader.load('resources/record.mp3')
+        self.finish_sound = SoundLoader.load('resources/win.mp3')
+
     def on_enter(self, *args):
         seconds = self.manager.time_current
         moves_current = self.manager.moves_current
@@ -183,11 +189,33 @@ class FinishScreen(Screen):
         self.ids.time_label.text = f"{minutes:02d}:{seconds_remaining:02d}"
         self.ids.move_label.text = f"{moves_current}"
         record_time = utils.Logs().record['time_seconds']
-        if seconds>record_time:
+        if seconds>=record_time:
             minutes_r = record_time // 60
             seconds_remaining_r = record_time % 60
             self.ids.record_label.text = f"Рекорд {minutes_r:02d}:{seconds_remaining_r:02d}"
+            self.play_sound(record=True)
+        else:
+            self.play_sound()
 
+    def on_leave(self):
+        self.stop_sound()
+
+    def play_sound(self,record=False):
+        if record:
+            if self.finish_sound:
+                self.finish_sound.loop = True  # Зацикливание музыки
+                self.finish_sound.play()
+        else:
+            if self.record_sound:
+                self.record_sound.loop = True  # Зацикливание музыки
+                self.record_sound.play()
+
+    def stop_sound(self):
+        # Останавливаем звук при уходе с экрана
+        if self.finish_sound:
+            self.finish_sound.stop()
+        if self.record_sound:
+            self.record_sound.stop()
 
     def restart_game(self):
         self.manager.current = "start"

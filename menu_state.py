@@ -170,8 +170,7 @@ class StartScreen(Screen):
         # Останавливаем звук при уходе с экрана
         if self.move_sound:
             self.move_sound.stop()
-            """self.move_sound.unload()
-            self.move_sound = None"""
+
 
     def switch_to_game(self, instance):
         game = self.manager.get_screen('game')
