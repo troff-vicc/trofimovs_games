@@ -174,14 +174,19 @@ class FinishScreen(Screen):
     time_now = NumericProperty(0)
 
     def on_enter(self, *args):
-        seconds = self.manager.time_current
-        moves_current = self.manager.moves_current
-        """moves_current = 0
-        seconds = 10"""
+        """seconds = self.manager.time_current
+        moves_current = self.manager.moves_current"""
+        moves_current = 0
+        seconds = 10000
         minutes = seconds // 60
         seconds_remaining = seconds % 60
         self.ids.time_label.text = f"{minutes:02d}:{seconds_remaining:02d}"
         self.ids.move_label.text = f"{moves_current}"
+        record_time = utils.Logs().record['time_seconds']
+        if seconds>record_time:
+            minutes_r = record_time // 60
+            seconds_remaining_r = record_time % 60
+            self.ids.record_label.text = f"Рекорд {minutes_r:02d}:{seconds_remaining_r:02d}"
 
 
     def restart_game(self):
