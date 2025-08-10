@@ -214,6 +214,7 @@ class GameScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.logs = utils.Logs()
+        self.pos_tiles = []
 
     def on_size(self, *args):
         # Обновляем размеры при изменении размера экрана
@@ -222,8 +223,8 @@ class GameScreen(Screen):
         grid.height = grid.width
 
     def create_grid_buttons(self):
-        self.ids.grid.clear_widgets()
         grid = self.ids.grid
+        grid.clear_widgets()
         
         numbers = np.arange(1, 17)  # 1-16 (16 - пустая клетка)
         numbers[15] = 0
@@ -261,6 +262,11 @@ class GameScreen(Screen):
         self.empty_pos = divmod(empty_pos, 4)
 
     def move_tile(self, instance):
+        
+        if not self.pos_tiles:
+            for tile in self.tiles:
+                self.pos_tiles.append(tile.pos.copy())
+                
         idx = self.tiles.index(instance)
         row, col = divmod(idx, 4)
         empty_row, empty_col = self.empty_pos
@@ -281,17 +287,14 @@ class GameScreen(Screen):
 
             for idx_one in list_idx[1:]:
                 tiles_one = self.tiles[idx_one]
-                pos1 = empty_tile.pos.copy()
-                pos2 = tiles_one.pos.copy()
+                pos1 = self.pos_tiles[empty_idx]
+                pos2 = self.pos_tiles[idx_one]
 
                 Animation(pos=pos1, duration=0.15).start(tiles_one)
                 Animation(pos=pos2, duration=0.15).start(empty_tile)
 
                 self.tiles[idx_one] = empty_tile
                 self.tiles[empty_idx] = tiles_one
-
-                empty_tile.pos = pos2
-                tiles_one.pos = pos1
 
                 empty_idx = idx_one
                 self.empty_pos = divmod(idx_one, 4)
@@ -347,6 +350,8 @@ class GameScreen(Screen):
             self.start_time = int(time.time())
         else:
             self.start_time = int(time.time()) - int(current_time)
+            
+        self.create_grid_buttons()
 
     def stop_counter(self):
         # Останавливаем обновление счетчика

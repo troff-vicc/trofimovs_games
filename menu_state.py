@@ -155,7 +155,6 @@ class StartScreen(Screen):
     def switch_to_game(self, instance):
         game = self.manager.get_screen('game')
         game.start_counter()
-        game.create_grid_buttons()
         self.manager.current = "game"
     
     def on_record(self, *args):
