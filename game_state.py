@@ -341,18 +341,22 @@ class GameScreen(Screen):
         seconds = seconds % 60  # Остаток от деления
         return f'{minutes:02d}:{seconds:02d}'
     
-    def start_counter(self, current_time=0):
+    def start(self):
         self.tiles = []
         self.moves = 0
         self.empty_pos = (3, 3)
+        
+        self.start_counter()
+        
+        self.create_grid_buttons()
+        
+    def start_counter(self, current_time=0):
         self.clock_event = Clock.schedule_interval(self.update_counter, 1.0)
         if current_time == 0:
             self.start_time = int(time.time())
         else:
             self.start_time = int(time.time()) - int(current_time)
             
-        self.create_grid_buttons()
-
     def stop_counter(self):
         # Останавливаем обновление счетчика
         if self.clock_event:

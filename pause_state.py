@@ -161,6 +161,8 @@ class PauseScreen(Screen):
         self.ids.move_label.text = f"{self.manager.moves_current}"
 
     def resume_game(self):
+        game = self.manager.get_screen('game')
+        game.start_counter(self.manager.time_current)
         self.manager.current = "game"
 
     def restart_game(self):
