@@ -7,6 +7,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.properties import NumericProperty
 from kivy.utils import get_color_from_hex
+from kivy.core.audio import SoundLoader
 import utils
 from constants import *
 
@@ -19,6 +20,11 @@ class StartScreen(Screen):
         self.logs = utils.Logs()
         self.load_record()
         self.build_ui()
+        self.move_sound = SoundLoader.load('resources/start.mp3')
+
+
+    def on_enter(self, *args):
+        self.play_sound()
     
     def build_ui(self):
         #kivy_blue = (BLUE[0] / 255, BLUE[1] / 255, BLUE[2] / 255, 1)
@@ -151,7 +157,11 @@ class StartScreen(Screen):
     
     def load_record(self):
         self.record = self.logs.record['time_seconds']
-    
+
+    def play_sound(self):
+        if self.move_sound:
+            self.move_sound.play()
+
     def switch_to_game(self, instance):
         game = self.manager.get_screen('game')
         game.start()
