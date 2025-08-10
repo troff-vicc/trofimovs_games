@@ -205,6 +205,7 @@ def draw_letter(layout, letter, on_press_def):
 class ImageButton(ButtonBehavior, Image):
     pass
 
+
 class VibratorService:
     def __init__(self):
         self.service = None
@@ -231,6 +232,7 @@ class VibratorService:
             print(f"Vibration error: {e}")
             return False
 
+
 class GameScreen(Screen):
     background_color = get_color_from_hex('#F0FDF5')
     text_color = get_color_from_hex('#6B7280')
@@ -244,12 +246,14 @@ class GameScreen(Screen):
         self.pos_tiles = []
         self.vibrator = VibratorService()
 
-
     def on_size(self, *args):
         # Обновляем размеры при изменении размера экрана
         grid = self.ids.grid
         grid.width = min(dp(400), self.width * 0.95)
         grid.height = grid.width
+    
+    def on_minimize(self):
+        self.manager.current = "pause"
                 
     def create_grid_buttons(self):
         grid = self.ids.grid
