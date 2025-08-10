@@ -221,7 +221,7 @@ class GameScreen(Screen):
         grid = self.ids.grid
         grid.width = min(dp(400), self.width * 0.95)
         grid.height = grid.width
-
+                
     def create_grid_buttons(self):
         grid = self.ids.grid
         grid.clear_widgets()
@@ -262,7 +262,6 @@ class GameScreen(Screen):
         self.empty_pos = divmod(empty_pos, 4)
 
     def move_tile(self, instance):
-        
         if not self.pos_tiles:
             for tile in self.tiles:
                 self.pos_tiles.append(tile.pos.copy())
@@ -295,6 +294,9 @@ class GameScreen(Screen):
 
                 self.tiles[idx_one] = empty_tile
                 self.tiles[empty_idx] = tiles_one
+                
+                empty_tile.pos = pos2
+                tiles_one.pos = pos1
 
                 empty_idx = idx_one
                 self.empty_pos = divmod(idx_one, 4)
