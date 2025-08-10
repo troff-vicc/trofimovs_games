@@ -10,7 +10,8 @@ from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
-from kivy.utils import get_color_from_hex
+from kivy.utils import get_color_from_hex, platform
+from plyer import vibrator
 
 import time
 import utils
@@ -216,6 +217,7 @@ class GameScreen(Screen):
         self.logs = utils.Logs()
         self.pos_tiles = []
 
+
     def on_size(self, *args):
         # Обновляем размеры при изменении размера экрана
         grid = self.ids.grid
@@ -300,10 +302,16 @@ class GameScreen(Screen):
                 self.empty_pos = divmod(idx_one, 4)
 
             self.moves += 1
+            self.vibrate()
 
             # Проверка победы
             if self.check_win():
                 self.handle_win()
+
+    def vibrate(self):
+        if platform == 'android':
+            vibrator.vibrate(time=0.1)
+
 
     def check_win(self):
         """Проверка победы"""
@@ -366,4 +374,3 @@ class GameScreen(Screen):
     def update_counter(self, dt):
         # Эта функция будет вызываться каждую секунду
         self.time_now = int(time.time()) - self.start_time
-    

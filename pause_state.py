@@ -2,6 +2,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivy.properties import NumericProperty
 from kivy.utils import get_color_from_hex
+
 from kivy.metrics import dp
 import utils
 from constants import *
@@ -151,7 +152,6 @@ class PauseScreen(Screen):
 
     moves = NumericProperty(0)
     time_now = NumericProperty(0)
-    #time_now = Screen.time_current
     
     def on_enter(self, *args):
         seconds = self.manager.time_current

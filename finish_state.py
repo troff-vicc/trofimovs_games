@@ -174,10 +174,10 @@ class FinishScreen(Screen):
     time_now = NumericProperty(0)
 
     def on_enter(self, *args):
-        """seconds = self.manager.time_current
-        moves_current = self.manager.moves_current"""
-        moves_current = 0
-        seconds = 10000
+        seconds = self.manager.time_current
+        moves_current = self.manager.moves_current
+        """moves_current = 0
+        seconds = 10000"""
         minutes = seconds // 60
         seconds_remaining = seconds % 60
         self.ids.time_label.text = f"{minutes:02d}:{seconds_remaining:02d}"
