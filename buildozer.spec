@@ -29,7 +29,7 @@ source.include_exts = py,png,json,mp3
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.10
+version = 0.12
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -106,6 +106,7 @@ android.permissions = VIBRATE
 
 # (int) Minimum API your APK / AAB will support.
 android.minapi = 24
+android.targetapi = 33
 
 # (int) Android SDK version to use
 #android.sdk = 20
@@ -306,7 +307,13 @@ android.allow_backup = True
 # android.no-byte-compile-python = False
 
 # (str) The format used to package the app for release mode (aab or apk or aar).
-# android.release_artifact = aab
+android.release_artifact = aar
+
+# (str) Keystore path (if blank, buildozer will generate one for you)
+android.keystore.path = fifteen.keystore
+android.keystore.alias = fifteen_release
+android.keystore.storepass = q123456
+android.keystore.keypass = q123456
 
 # (str) The format used to package the app for debug mode (apk or aar).
 # android.debug_artifact = apk
@@ -403,7 +410,7 @@ ios.codesign.allowed = false
 [buildozer]
 
 # (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
-log_level = 2
+log_level = 1
 
 # (int) Display warning if buildozer is run as root (0 = False, 1 = True)
 warn_on_root = 1

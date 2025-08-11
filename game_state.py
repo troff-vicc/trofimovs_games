@@ -245,6 +245,7 @@ class GameScreen(Screen):
         self.logs = utils.Logs()
         self.pos_tiles = []
         self.vibrator = VibratorService()
+        Window.bind(on_minimize=self.on_minimize)
 
     def on_size(self, *args):
         # Обновляем размеры при изменении размера экрана
@@ -253,8 +254,12 @@ class GameScreen(Screen):
         grid.height = grid.width
     
     def on_minimize(self):
-        self.manager.current = "pause"
-                
+        try:
+            self.manager.current = "pause"
+        except Exception as e:
+            self.show_error(f"Ошибка в on_minimize: {e}")
+
+
     def create_grid_buttons(self):
         grid = self.ids.grid
         grid.clear_widgets()
