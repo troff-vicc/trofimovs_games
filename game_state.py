@@ -243,6 +243,7 @@ class GameScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.logs = utils.Logs()
+        self.logs_errors = utils.LogsError()
         self.pos_tiles = []
         self.vibrator = VibratorService()
 
@@ -251,7 +252,6 @@ class GameScreen(Screen):
         grid = self.ids.grid
         grid.width = min(dp(400), self.width * 0.95)
         grid.height = grid.width
-
 
     def create_grid_buttons(self):
         grid = self.ids.grid
@@ -296,6 +296,7 @@ class GameScreen(Screen):
         if not self.pos_tiles:
             for tile in self.tiles:
                 self.pos_tiles.append(tile.pos.copy())
+            self.logs_errors.add_log('None', str(self.pos_tiles))
                 
         idx = self.tiles.index(instance)
         row, col = divmod(idx, 4)

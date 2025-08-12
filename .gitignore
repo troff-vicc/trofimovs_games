@@ -1,3 +1,4 @@
 .idea
 /logs.json
 .buildozer
+/logsError.json

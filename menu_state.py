@@ -8,6 +8,9 @@ from kivy.uix.label import Label
 from kivy.properties import NumericProperty
 from kivy.utils import get_color_from_hex
 from kivy.core.audio import SoundLoader
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.popup import Popup
+from kivy.metrics import dp
 import utils
 from constants import *
 
@@ -21,7 +24,6 @@ class StartScreen(Screen):
         self.load_record()
         self.build_ui()
         self.move_sound = SoundLoader.load('resources/start.mp3')
-
 
     def on_enter(self, *args):
         self.play_sound()
@@ -123,8 +125,17 @@ class StartScreen(Screen):
             background_down='resources/playbutton.png',  # Та же картинка при нажатии
             border=(0, 0, 0, 0)  # Убираем границы кнопки
         )
+        log_btn = Button(
+            size_hint=(0.65, 0.2),
+            pos_hint={'center_x': 0.5, 'y': 0.5},
+            background_normal='resources/playbutton.png',
+            background_down='resources/playbutton.png',  # Та же картинка при нажатии
+            border=(0, 0, 0, 0)  # Убираем границы кнопки
+        )
         start_btn.bind(on_press=self.switch_to_game)
+        log_btn.bind(on_press=self.show_logs)
         main_layout.add_widget(start_btn)
+        main_layout.add_widget(log_btn)
         
         # Создаем горизонтальный layout 4
         h_layout = BoxLayout(orientation='horizontal',
@@ -170,7 +181,78 @@ class StartScreen(Screen):
         # Останавливаем звук при уходе с экрана
         if self.move_sound:
             self.move_sound.stop()
-
+    
+    def show_logs(self, instance):
+        # Получаем логи
+        logs = utils.LogsError().get_logs(limit=20)
+        
+        # Создаем Popup layout
+        layout = BoxLayout(orientation='vertical', spacing=dp(10), padding=dp(10))
+        
+        # Заголовок
+        title_label = Label(
+            text='Error Logs', 
+            size_hint_y=None, 
+            height=dp(40),
+            font_size=dp(18),
+            bold=True
+        )
+        layout.add_widget(title_label)
+        
+        # Создаем Label с правильными настройками для переноса текста
+        logs_text = '\n'.join(
+            f"[{log['timestamp']}] {log['type']} (screen: {log['screen'] or 'N/A'}):\n{log['message']}\n"
+            for log in reversed(logs)
+        )
+        
+        logs_label = Label(
+            text=logs_text,
+            halign='left',
+            valign='top',
+            size_hint_y=None,
+            text_size=(None, None),
+            padding=(dp(10), dp(10)),
+            font_size=dp(14),
+            color=(0.9, 0.9, 0.9, 1)
+        )
+        
+        # Рассчитываем необходимую высоту для Label
+        logs_label.bind(
+            width=lambda *x: logs_label.setter('text_size')(logs_label, (logs_label.width, None)),
+            texture_size=lambda *x: logs_label.setter('height')(logs_label, logs_label.texture_size[1])
+        )
+        
+        # Настраиваем ScrollView
+        scroll = ScrollView(
+            size_hint=(1, 1),
+            bar_width=dp(10),
+            bar_color=[0.5, 0.5, 0.5, 0.8],
+            bar_inactive_color=[0.5, 0.5, 0.5, 0.2],
+            scroll_type=['bars', 'content'],
+            do_scroll_x=False  # Только вертикальный скролл
+        )
+        scroll.add_widget(logs_label)
+        layout.add_widget(scroll)
+        
+        # Кнопка закрытия
+        btn_close = Button(
+            text='Close',
+            size_hint_y=None,
+            height=dp(50),
+            background_normal='',
+            background_color=(0.3, 0.3, 0.5, 1)
+        )
+        layout.add_widget(btn_close)
+        
+        # Создаем Popup
+        popup = Popup(
+            title='',
+            content=layout,
+            size_hint=(0.9, 0.9),
+            separator_height=0
+        )
+        btn_close.bind(on_release=popup.dismiss)
+        popup.open()
 
     def switch_to_game(self, instance):
         game = self.manager.get_screen('game')
