@@ -1,6 +1,7 @@
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager
 from kivy.core.window import Window
+from kivy.clock import Clock
 from menu_state import StartScreen
 from game_state import GameScreen
 from finish_state import FinishScreen
@@ -23,6 +24,17 @@ class FifteenPuzzleApp(App):
 
         return sm
 
+    def on_pause(self):
+        # Пробрасываем событие в текущий экран
+        current_screen = self.root.current_screen
+        if hasattr(current_screen, 'on_pause'):
+            return current_screen.on_pause()
+        return True
+
+    def on_resume(self):
+        current_screen = self.root.current_screen
+        if hasattr(current_screen, 'on_resume'):
+            current_screen.on_resume()
 
 if __name__ == "__main__":
     FifteenPuzzleApp().run()
