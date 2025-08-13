@@ -296,7 +296,6 @@ class GameScreen(Screen):
         if not self.pos_tiles:
             for tile in self.tiles:
                 self.pos_tiles.append(tile.pos.copy())
-            self.logs_errors.add_log('None', str(self.pos_tiles))
                 
         idx = self.tiles.index(instance)
         row, col = divmod(idx, 4)
@@ -415,29 +414,8 @@ class GameScreen(Screen):
         )
         popup.open()
 
-    def save_positions(self):
-        """Сохраняет текущие позиции виджетов"""
-        self.saved_positions = []
-        for i in range(16):
-            self.saved_positions.append(self.tiles[i].pos)
-
-    def update_widget_positions(self):
-        for i in range(16):
-            self.tiles[i].pos = self.saved_positions[i]
-
     def on_pause(self):
         """Вызывается при сворачивании/засыпании"""
-        self.save_positions()
+        self.back_button_pressed()
         return True
 
-    def on_resume(self):
-        """Вызывается при возобновлении"""
-        Clock.schedule_once(self.delayed_resume, 0.1)
-
-    def delayed_resume(self, dt):
-        # Ждем, пока окно примет корректные размеры
-        if Window.width == 0 or Window.height == 0:
-            Clock.schedule_once(self.delayed_resume, 0.1)
-            return
-
-        self.update_widget_positions()

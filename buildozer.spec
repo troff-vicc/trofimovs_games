@@ -29,7 +29,7 @@ source.include_exts = py,png,json,mp3
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.17
+version = 0.23
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -74,7 +74,7 @@ osx.kivy_version = 1.9.1
 #
 
 # (bool) Indicate if the application should be fullscreen or not
-fullscreen = 1
+fullscreen = 0
 
 # (string) Presplash background color (for android toolchain)
 # Supported formats are: #RRGGBB #AARRGGBB or one of the following names:
@@ -197,7 +197,7 @@ android.targetapi = 33
 # android.add_resources = my_icons/all-inclusive.png:drawable/all_inclusive.png
 # 2) A directory, here  'legal_icons' must contain resources of one kind
 # android.add_resources = legal_icons:drawable
-# 3) A directory, here 'legal_resources' must contain one or more directories, 
+# 3) A directory, here 'legal_resources' must contain one or more directories,
 # each of a resource kind:  drawable, xml, etc...
 # android.add_resources = legal_resources
 #android.add_resources =
@@ -216,14 +216,14 @@ android.targetapi = 33
 # android.add_compile_options = "sourceCompatibility = 1.8", "targetCompatibility = 1.8"
 
 # (list) Gradle repositories to add {can be necessary for some android.gradle_dependencies}
-# please enclose in double quotes 
+# please enclose in double quotes
 # e.g. android.gradle_repositories = "maven { url 'https://kotlin.bintray.com/ktor' }"
 #android.add_gradle_repositories =
 
-# (list) packaging options to add 
+# (list) packaging options to add
 # see https://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.PackagingOptions.html
 # can be necessary to solve conflicts in gradle_dependencies
-# please enclose in double quotes 
+# please enclose in double quotes
 # e.g. android.add_packaging_options = "exclude 'META-INF/common.kotlin_module'", "exclude 'META-INF/*.kotlin_module'"
 #android.add_packaging_options =
 
@@ -410,7 +410,7 @@ ios.codesign.allowed = false
 [buildozer]
 
 # (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
-log_level = 0
+log_level = 2
 
 # (int) Display warning if buildozer is run as root (0 = False, 1 = True)
 warn_on_root = 1

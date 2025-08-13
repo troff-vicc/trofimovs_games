@@ -6,6 +6,7 @@ from menu_state import StartScreen
 from game_state import GameScreen
 from finish_state import FinishScreen
 from pause_state import PauseScreen
+import utils
 
 
 class FifteenPuzzleApp(App):

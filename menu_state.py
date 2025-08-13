@@ -125,18 +125,17 @@ class StartScreen(Screen):
             background_down='resources/playbutton.png',  # Та же картинка при нажатии
             border=(0, 0, 0, 0)  # Убираем границы кнопки
         )
-        log_btn = Button(
+        """log_btn = Button(
             size_hint=(0.65, 0.2),
             pos_hint={'center_x': 0.5, 'y': 0.5},
-            background_normal='resources/playbutton.png',
-            background_down='resources/playbutton.png',  # Та же картинка при нажатии
+            text='ЛОГИ',
             border=(0, 0, 0, 0)  # Убираем границы кнопки
         )
-        start_btn.bind(on_press=self.switch_to_game)
         log_btn.bind(on_press=self.show_logs)
+        main_layout.add_widget(log_btn)"""
+        start_btn.bind(on_press=self.switch_to_game)
         main_layout.add_widget(start_btn)
-        main_layout.add_widget(log_btn)
-        
+
         # Создаем горизонтальный layout 4
         h_layout = BoxLayout(orientation='horizontal',
                              size_hint=(0.3, 0.2),
