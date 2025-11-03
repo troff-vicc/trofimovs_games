@@ -1,12 +1,11 @@
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager
 from kivy.core.window import Window
-from kivy.clock import Clock
+from settings_manager import SettingsManager
 from menu_state import StartScreen
 from game_state import GameScreen
 from finish_state import FinishScreen
 from pause_state import PauseScreen
-import utils
 
 
 class FifteenPuzzleApp(App):
@@ -15,13 +14,14 @@ class FifteenPuzzleApp(App):
         Window.fullscreen = 'auto'  # для адаптации
 
         sm = ScreenManager()
+        sm.settings = SettingsManager()
 
         sm.add_widget(StartScreen(name="start"))
         sm.add_widget(GameScreen(name="game"))
         sm.add_widget(FinishScreen(name="finish"))
         sm.add_widget(PauseScreen(name="pause"))
-
         sm.current = "start"
+
 
         return sm
 

@@ -341,8 +341,9 @@ class GameScreen(Screen):
 
     def vibrate(self):
         if platform == 'android':
-            if not self.vibrator.vibrate(0.1):
-                self.show_error("Вибратор недоступен!\nПроверьте разрешения")
+            if self.manager.settings.vibration_enabled:
+                if not self.vibrator.vibrate(0.1):
+                    self.show_error("Вибратор недоступен!\nПроверьте разрешения")
 
     def check_win(self):
         """Проверка победы"""

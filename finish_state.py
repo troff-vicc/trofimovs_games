@@ -201,21 +201,23 @@ class FinishScreen(Screen):
         self.stop_sound()
 
     def play_sound(self,record=False):
-        if record:
-            if self.finish_sound:
-                self.finish_sound.loop = True  # Зацикливание музыки
-                self.finish_sound.play()
-        else:
-            if self.record_sound:
-                self.record_sound.loop = True  # Зацикливание музыки
-                self.record_sound.play()
+        if self.manager.settings.sound_enabled:
+            if record:
+                if self.finish_sound:
+                    self.finish_sound.loop = True  # Зацикливание музыки
+                    self.finish_sound.play()
+            else:
+                if self.record_sound:
+                    self.record_sound.loop = True  # Зацикливание музыки
+                    self.record_sound.play()
 
     def stop_sound(self):
-        # Останавливаем звук при уходе с экрана
-        if self.finish_sound:
-            self.finish_sound.stop()
-        if self.record_sound:
-            self.record_sound.stop()
+        if self.manager.settings.sound_enabled:
+            # Останавливаем звук при уходе с экрана
+            if self.finish_sound:
+                self.finish_sound.stop()
+            if self.record_sound:
+                self.record_sound.stop()
 
     def restart_game(self):
         self.manager.current = "start"

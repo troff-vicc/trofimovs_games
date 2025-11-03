@@ -1,7 +1,7 @@
 [app]
 
 # (str) Title of your application
-title = FifteenPuzzleApp
+title = Пятнашки
 
 # (str) Package name
 package.name = FifteenPuzzleApp
@@ -29,7 +29,7 @@ source.include_exts = py,png,json,mp3
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.23
+version = 1.1
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -81,7 +81,7 @@ fullscreen = 0
 # red, blue, green, black, white, gray, cyan, magenta, yellow, lightgray,
 # darkgray, grey, lightgrey, darkgrey, aqua, fuchsia, lime, maroon, navy,
 # olive, purple, silver, teal.
-#android.presplash_color = #FFFFFF
+android.presplash_color = #F0FDF5
 
 # (string) Presplash animation using Lottie format.
 # see https://lottiefiles.com/ for examples and https://airbnb.design/lottie/
@@ -102,11 +102,11 @@ android.permissions = VIBRATE
 #android.features = android.hardware.usb.host
 
 # (int) Target Android API, should be as high as possible.
-#android.api = 31
+android.api = 34
 
 # (int) Minimum API your APK / AAB will support.
 android.minapi = 24
-android.targetapi = 33
+#android.targetapi = 33
 
 # (int) Android SDK version to use
 #android.sdk = 20
@@ -285,7 +285,7 @@ android.targetapi = 33
 
 # (list) The Android archs to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
 # In past, was `android.arch` as we weren't supporting builds for multiple archs at the same time.
-android.archs = arm64-v8a, armeabi-v7a
+android.archs = arm64-v8a
 
 # (int) overrides automatic versionCode computation (used in build.gradle)
 # this is not the same as app version and should only be edited if you know what you're doing
@@ -307,10 +307,10 @@ android.allow_backup = True
 # android.no-byte-compile-python = False
 
 # (str) The format used to package the app for release mode (aab or apk or aar).
-android.release_artifact = aar
+android.release_artifact = aab
 
 # (str) Keystore path (if blank, buildozer will generate one for you)
-android.keystore.path = fifteen.keystore
+android.keystore.path = /Users/ivan/PycharmProjects/trofimovs_games/keystores/fifteen.keystore
 android.keystore.alias = fifteen_release
 android.keystore.storepass = q123456
 android.keystore.keypass = q123456

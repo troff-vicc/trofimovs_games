@@ -11,6 +11,8 @@ from kivy.core.audio import SoundLoader
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.popup import Popup
 from kivy.metrics import dp
+
+
 import utils
 from constants import *
 
@@ -24,9 +26,17 @@ class StartScreen(Screen):
         self.load_record()
         self.build_ui()
         self.move_sound = SoundLoader.load('resources/start.mp3')
+        #self.label_record = None
 
     def on_enter(self, *args):
         self.play_sound()
+        self.logs = utils.Logs()
+        self.label_record.text=f"{self.on_record()}"
+        image_sound = 'resources/sound.png' if self.manager.settings.sound_enabled else 'resources/sound_no.png'
+        self.sound_btn.background_normal = image_sound
+        image_vibr = 'resources/vibration.png' if self.manager.settings.vibration_enabled else 'resources/vibration_no.png'
+        self.vibr_btn.background_normal = image_vibr
+
 
     def on_leave(self):
         self.stop_sound()
@@ -120,7 +130,7 @@ class StartScreen(Screen):
         # Кнопка запуска
         start_btn = Button(
             size_hint=(0.65, 0.2),
-            pos_hint={'center_x': 0.5, 'y': 0.3},
+            pos_hint={'center_x': 0.5, 'y': 0.4},
             background_normal='resources/playbutton.png',
             background_down='resources/playbutton.png',  # Та же картинка при нажатии
             border=(0, 0, 0, 0)  # Убираем границы кнопки
@@ -135,6 +145,28 @@ class StartScreen(Screen):
         main_layout.add_widget(log_btn)"""
         start_btn.bind(on_press=self.switch_to_game)
         main_layout.add_widget(start_btn)
+
+        image_sound = 'resources/sound.png'
+        sound_btn = Button(
+            size_hint=(0.05, 0.05),
+            pos_hint={'center_x': 0.45, 'y': 0.25},
+            background_normal=image_sound,
+            border=(0, 0, 0, 0)  # Убираем границы кнопки
+        )
+        sound_btn.bind(on_press=self.toggle_sound)
+        main_layout.add_widget(sound_btn)
+        self.sound_btn = sound_btn
+
+        image_vibr = 'resources/vibration.png'
+        vibr_btn = Button(
+            size_hint=(0.05, 0.05),
+            pos_hint={'center_x': 0.55, 'y': 0.25},
+            background_normal=image_vibr,
+            border=(0, 0, 0, 0)  # Убираем границы кнопки
+        )
+        vibr_btn.bind(on_press=self.toggle_vibration)
+        main_layout.add_widget(vibr_btn)
+        self.vibr_btn = vibr_btn
 
         # Создаем горизонтальный layout 4
         h_layout = BoxLayout(orientation='horizontal',
@@ -154,6 +186,7 @@ class StartScreen(Screen):
         record_label = Label(text=f"Рекорд", font_size='20sp', color=BLACK, bold=True)
         # Добавляем надпись со временем
         time_label = Label(text=f"{self.on_record()}", font_size='20sp', color=BLACK, bold=True)
+        self.label_record = time_label
         v_layout.add_widget(record_label)
         v_layout.add_widget(time_label)
         h_layout.add_widget(v_layout)
@@ -174,7 +207,8 @@ class StartScreen(Screen):
     def play_sound(self):
         if self.move_sound:
             self.move_sound.loop = True  # Зацикливание музыки
-            self.move_sound.play()
+            if self.manager.settings.sound_enabled:
+                self.move_sound.play()
 
     def stop_sound(self):
         # Останавливаем звук при уходе с экрана
@@ -252,6 +286,27 @@ class StartScreen(Screen):
         )
         btn_close.bind(on_release=popup.dismiss)
         popup.open()
+
+    def toggle_sound(self, instance):
+        new_value = not self.manager.settings.sound_enabled
+        self.manager.settings.sound_enabled = new_value
+        self.manager.settings.save_settings()
+        if new_value:
+            instance.background_normal = 'resources/sound.png'
+            self.play_sound()
+        else:
+            instance.background_normal = 'resources/sound_no.png'
+            self.stop_sound()
+
+
+    def toggle_vibration(self, instance):
+        new_value = not self.manager.settings.vibration_enabled
+        self.manager.settings.vibration_enabled = new_value
+        self.manager.settings.save_settings()
+        if new_value:
+            instance.background_normal = 'resources/vibration.png'
+        else:
+            instance.background_normal = 'resources/vibration_no.png'
 
     def switch_to_game(self, instance):
         game = self.manager.get_screen('game')
